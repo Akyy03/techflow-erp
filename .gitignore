@@ -1,30 +1,29 @@
-# Maven
-target/
+# Maven (Backend)
+**/target/
 !.mvn/wrapper/maven-wrapper.jar
 
-# Node
-node_modules/
-dist/
-.angular/
+# Node & Angular (Frontend)
+**/node_modules/
+**/dist/
+**/.angular/
 
-# IDE
+# IDEs
 .idea/
 *.iml
 .vscode/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db
+**/bin/
+**/out/
 
 # Logs
 *.log
+**/logs/
 
-# Environment
+# Environment & OS
 .env
 application-local.properties
+.DS_Store
+Thumbs.db
 
-# Database
+# Database (Docker data)
+mysql_data/
 *.db
-*.sqlite
