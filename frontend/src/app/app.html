@@ -1,0 +1,25 @@
+<div class="min-h-screen bg-gray-50 p-8">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-extrabold text-gray-900 mb-6">Echipa TechFlow</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div *ngFor="let emp of employees()" 
+           class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition">
+        <div class="flex justify-between items-start">
+          <div>
+            <h2 class="text-xl font-bold text-blue-600">{{ emp.firstName }} {{ emp.lastName }}</h2>
+            <p class="text-gray-500 font-medium">{{ emp.position }}</p>
+          </div>
+        </div>
+        <div class="mt-4 text-sm text-gray-600">
+          <p>📧 {{ emp.email }}</p>
+          <p>💰 {{ emp.salary | currency:'EUR' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="employees().length === 0" class="mt-10 text-center p-12 border-2 border-dashed rounded-xl">
+      <p class="text-gray-400 italic">Nu am găsit angajați...</p>
+    </div>
+  </div>
+</div>

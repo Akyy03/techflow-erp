@@ -21,11 +21,17 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable) // Dezactivăm protecția CSRF
+                .cors(cors -> cors.configurationSource(request -> {
+                    var opt = new org.springframework.web.cors.CorsConfiguration();
+                    opt.setAllowedOrigins(java.util.List.of("http://localhost:4200")); // Permite Angular
+                    opt.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                    opt.setAllowedHeaders(java.util.List.of("*"));
+                    return opt;
+                }))
+                .csrf(csrf -> csrf.disable()) // Important pentru API-uri
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll() // PERMITE TOT - Doar pentru faza de dezvoltare/test
-                )
-                .headers(headers -> headers.frameOptions(frame -> frame.disable())); // Necesar dacă folosim H2 sau iframe-uri
+                        .anyRequest().permitAll() // Momentan lăsăm totul liber
+                );
 
         return http.build();
     }
