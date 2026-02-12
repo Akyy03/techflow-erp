@@ -8,6 +8,9 @@ export interface Employee {
   lastName: string;
   position: string;
   salary: number;
+  email: string;        // Nou
+  phone: string;  // Nou
+  hireDate: string;
 }
 
 @Injectable({

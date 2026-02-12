@@ -5,20 +5,31 @@
     background-color: #030712;
     color: white;
     margin: 0;
-    /* Adăugăm un padding global aici ca siguranță */
-    padding: 2rem; 
     font-family: sans-serif;
+  }
+
+  /* --- ELIMINARE SCROLLBAR / SPIN-BUTTONS SALARIU --- */
+  /* Chrome, Safari, Edge, Opera */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Firefox */
+  input[type=number] {
+    -moz-appearance: textfield;
+    appearance: textfield;
   }
 }
 
 @layer components {
   .bento-card {
     display: block;
-    /* Folosim o culoare mai deschisă să fim siguri că se vede pe negru */
     background-color: rgba(30, 41, 59, 0.8) !important; 
     border: 1px solid rgba(255, 255, 255, 0.2) !important;
     border-radius: 1.5rem;
-    padding: 2rem !important; /* Forțăm padding-ul în interiorul cardului */
+    padding: 2rem !important; 
     backdrop-filter: blur(10px);
     transition: all 0.3s ease;
     margin-bottom: 1rem;

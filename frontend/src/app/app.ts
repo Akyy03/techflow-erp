@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms'; // Necesar pentru formularul din modal
+import { FormsModule } from '@angular/forms'; 
 import { EmployeeService, Employee } from './services/employee';
 
 @Component({
@@ -12,14 +12,17 @@ import { EmployeeService, Employee } from './services/employee';
 export class App implements OnInit {
   // State Management cu Signals
   employees = signal<Employee[]>([]);
-  isModalOpen = signal(false); // Controlează afișarea modalului
+  isModalOpen = signal(false);
+  errorMessage = signal<string | null>(null); // Signal nou pentru erori de backend
   
-  // Obiect temporar pentru formular
   newEmployee = {
     firstName: '',
     lastName: '',
     position: '',
-    salary: 0
+    salary: 0,
+    email: '',
+    phone: '',
+    hireDate: new Date().toISOString().split('T')[0]
   };
 
   private employeeService = inject(EmployeeService);
@@ -34,11 +37,16 @@ export class App implements OnInit {
   }
 
   loadEmployees() {
-    this.employeeService.getEmployees().subscribe({
-      next: (data) => this.employees.set(data),
-      error: (err) => console.error('API Error:', err)
-    });
-  }
+  this.employeeService.getEmployees().subscribe({
+    next: (data: any) => {
+      console.log('Date de la server:', data);
+      // Dacă datele sunt înfășurate în "content", folosim data.content
+      const employeesArray = Array.isArray(data) ? data : (data.content || []);
+      this.employees.set(employeesArray);
+    },
+    error: (err) => console.error('Eroare API:', err)
+  });
+}
 
   // Gestiune Modal
   openAddModal() {
@@ -47,6 +55,7 @@ export class App implements OnInit {
 
   closeModal() {
     this.isModalOpen.set(false);
+    this.errorMessage.set(null); // Resetăm eroarea când închidem modalul
     this.resetForm();
   }
 
@@ -55,20 +64,38 @@ export class App implements OnInit {
       firstName: '',
       lastName: '',
       position: '',
-      salary: 0
+      salary: 0,
+      email: '',
+      phone: '',
+      hireDate: new Date().toISOString().split('T')[0]
     };
+  }
+
+  validatePhone(event: any) {
+    const input = event.target;
+    const cleanedValue = input.value.replace(/[^0-9+]/g, '');
+    this.newEmployee.phone = cleanedValue;
+    input.value = cleanedValue;
   }
 
   // CRUD Actions
   saveEmployee() {
-    // Trimitem obiectul către backend
+    this.errorMessage.set(null); // Resetăm eroarea la începutul salvării
+
     this.employeeService.addEmployee(this.newEmployee as Employee).subscribe({
       next: (addedEmployee) => {
-        // Update listă locală fără refresh
         this.employees.update(prev => [...prev, addedEmployee]);
         this.closeModal();
       },
-      error: (err) => console.error('Eroare la salvare:', err)
+      error: (err) => {
+        // Tratăm erorile de unicitate (Duplicate Entry)
+        if (err.status === 500 || err.status === 409) {
+          this.errorMessage.set('Identity Conflict: Email or Phone already exists in the system.');
+        } else {
+          this.errorMessage.set('System Error: Could not deploy talent.');
+        }
+        console.error('Save Error:', err);
+      }
     });
   }
 
@@ -83,14 +110,11 @@ export class App implements OnInit {
     }
   }
 
-  // Navigation & Menus
   viewEmployeeProfile(id: number) {
     console.log('Navigăm spre profilul angajatului:', id);
-    // Viitor: this.router.navigate(['/profile', id]);
   }
 
   openQuickActions(id: number) {
-    // Momentan deschidem direct delete pentru testare rapidă
     this.deleteEmployee(id);
   }
 }

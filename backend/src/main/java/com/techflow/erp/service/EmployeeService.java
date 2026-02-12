@@ -23,7 +23,7 @@ public class EmployeeService {
                         emp.getId(),
                         emp.getFirstName(),
                         emp.getLastName(),
-                        emp.getUser().getEmail(),
+                        emp.getUser() != null ? emp.getUser().getEmail() : "no-email@techflow.com",
                         emp.getPosition(),
                         emp.getSalary()
                 ))

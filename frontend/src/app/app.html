@@ -30,8 +30,8 @@
 
     @for (emp of employees(); track emp.id) {
       <div class="bento-card" 
-           (click)="viewEmployeeProfile(emp.id!)"
-           style="position: relative; cursor: pointer; overflow: hidden;">
+            (click)="viewEmployeeProfile(emp.id!)"
+            style="position: relative; cursor: pointer; overflow: hidden;">
         
         <button (click)="$event.stopPropagation(); openQuickActions(emp.id!)" 
                 style="position: absolute; top: 15px; right: 15px; background: none; border: none; color: #475569; cursor: pointer; padding: 5px; z-index: 10;"
@@ -44,7 +44,7 @@
 
         <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
            <div style="width: 52px; height: 52px; background: linear-gradient(135deg, #6366f1, #a855f7); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 800; color: white; font-size: 1.2rem; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);">
-              {{ emp.firstName[0] }}
+              {{ emp.firstName ? emp.firstName[0] : '?' }}
            </div>
            <div>
               <h3 style="margin: 0; font-size: 1.15rem; color: #f8fafc; font-weight: 700;">{{ emp.firstName }} {{ emp.lastName }}</h3>
@@ -64,10 +64,10 @@
 <div *ngIf="isModalOpen()" 
      style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(12px); background: rgba(0,0,0,0.7);">
   
-  <div class="bento-card" style="width: 100%; max-width: 450px; background: #0f172a; border: 1px solid rgba(255,255,255,0.1); padding: 40px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8);">
+  <div class="bento-card" style="width: 100%; max-width: 550px; background: #0f172a; border: 1px solid rgba(255,255,255,0.1); padding: 40px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8);">
     
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-      <h2 style="margin: 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -1px; color: white;">NEW TALENT<span style="color: #6366f1;">.</span></h2>
+      <h2 style="margin: 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -1px; color: white;">INITIALIZE TALENT<span style="color: #6366f1;">.</span></h2>
       <button (click)="closeModal()" style="background: none; border: none; color: #475569; cursor: pointer; font-size: 1.8rem; line-height: 1;">&times;</button>
     </div>
 
@@ -86,22 +86,41 @@
         </div>
 
         <div>
-          <label style="display: block; font-size: 0.65rem; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">Position</label>
-          <input [(ngModel)]="newEmployee.position" name="position" required style="width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 12px; color: white; outline: none;" placeholder="Senior Software Engineer">
+          <label style="display: block; font-size: 0.65rem; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">Corporate Email</label>
+          <input [(ngModel)]="newEmployee.email" name="email" type="email" required email #emailModel="ngModel" style="width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 12px; color: white; outline: none; transition: border-color 0.2s;" [style.border-color]="emailModel.invalid && emailModel.touched ? '#ef4444' : '#334155'" placeholder="j.doe@techflow.com">
+          <div *ngIf="emailModel.invalid && emailModel.touched" style="color: #ef4444; font-size: 0.65rem; margin-top: 5px; font-weight: 600;">Please enter a valid corporate email address.</div>
         </div>
 
-        <div>
-          <label style="display: block; font-size: 0.65rem; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">Salary (EUR)</label>
-          <input [(ngModel)]="newEmployee.salary" name="salary" type="number" required style="width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 12px; color: white; outline: none;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+          <div>
+            <label style="display: block; font-size: 0.65rem; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">Phone Number</label>
+            <input [(ngModel)]="newEmployee.phone" name="phone" (input)="validatePhone($event)" required style="width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 12px; color: white; outline: none;" placeholder="+40 7xx ...">
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.65rem; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">Position</label>
+            <input [(ngModel)]="newEmployee.position" name="position" required style="width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 12px; color: white; outline: none;" placeholder="Software Engineer">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+          <div>
+            <label style="display: block; font-size: 0.65rem; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">Salary (EUR)</label>
+            <input [(ngModel)]="newEmployee.salary" name="salary" type="number" min="0" required style="width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 12px; color: white; outline: none;">
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.65rem; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">Hire Date</label>
+            <input [(ngModel)]="newEmployee.hireDate" name="hireDate" type="date" style="width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 12px; color: white; outline: none;">
+          </div>
+        </div>
+
+        <div *ngIf="errorMessage()" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: #f87171; padding: 12px; border-radius: 10px; font-size: 0.75rem; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/></svg>
+          {{ errorMessage() }}
         </div>
 
         <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 2fr; gap: 15px;">
           <button type="button" (click)="closeModal()" style="background: transparent; border: 1px solid #334155; color: #94a3b8; padding: 14px; border-radius: 12px; cursor: pointer; font-weight: 600; transition: 0.2s;">Cancel</button>
-          <button type="submit" [disabled]="!empForm.form.valid" 
-                  style="background: #6366f1; border: none; color: white; padding: 14px; border-radius: 12px; cursor: pointer; font-weight: 700; box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4); opacity: 1;"
-                  [style.opacity]="empForm.form.valid ? '1' : '0.5'">
-            Initialize Talent
-          </button>
+          <button type="submit" [disabled]="!empForm.form.valid" style="background: #6366f1; border: none; color: white; padding: 14px; border-radius: 12px; cursor: pointer; font-weight: 700; box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);" [style.opacity]="empForm.form.valid ? '1' : '0.5'">Deploy to System</button>
         </div>
 
       </div>
