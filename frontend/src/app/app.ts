@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core'; // am adăugat signal
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EmployeeService, Employee } from './services/employee';
 
@@ -9,19 +9,18 @@ import { EmployeeService, Employee } from './services/employee';
   templateUrl: './app.html'
 })
 export class App implements OnInit {
-  // 1. Declarăm un semnal în loc de un simplu array
-  employees = signal<Employee[]>([]); 
-  
+  employees = signal<Employee[]>([]);
   private employeeService = inject(EmployeeService);
+
+  // Statistici calculate automat (Power of Signals 2026)
+  totalEmployees = computed(() => this.employees().length);
+  totalBudget = computed(() => this.employees().reduce((acc, emp) => acc + emp.salary, 0));
+  avgSalary = computed(() => this.totalEmployees() > 0 ? this.totalBudget() / this.totalEmployees() : 0);
 
   ngOnInit(): void {
     this.employeeService.getEmployees().subscribe({
-      next: (data: Employee[]) => {
-        // 2. Setăm valoarea semnalului
-        this.employees.set(data); 
-        console.log('Datele au ajuns și au fost puse în semnal:', data);
-      },
-      error: (err: any) => console.error('Eroare:', err)
+      next: (data) => this.employees.set(data),
+      error: (err) => console.error('API Error:', err)
     });
   }
 }

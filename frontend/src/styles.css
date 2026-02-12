@@ -1,4 +1,32 @@
 @import "tailwindcss";
 
-@theme {
+@layer base {
+  body {
+    background-color: #030712;
+    color: white;
+    margin: 0;
+    /* Adăugăm un padding global aici ca siguranță */
+    padding: 2rem; 
+    font-family: sans-serif;
+  }
+}
+
+@layer components {
+  .bento-card {
+    display: block;
+    /* Folosim o culoare mai deschisă să fim siguri că se vede pe negru */
+    background-color: rgba(30, 41, 59, 0.8) !important; 
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 1.5rem;
+    padding: 2rem !important; /* Forțăm padding-ul în interiorul cardului */
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    margin-bottom: 1rem;
+  }
+
+  .bento-card:hover {
+    background-color: rgba(51, 65, 85, 0.9) !important;
+    border-color: #6366f1 !important;
+    transform: translateY(-5px);
+  }
 }
