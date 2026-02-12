@@ -13,7 +13,11 @@ export class App implements OnInit {
   // State Management cu Signals
   employees = signal<Employee[]>([]);
   isModalOpen = signal(false);
-  errorMessage = signal<string | null>(null); // Signal nou pentru erori de backend
+  errorMessage = signal<string | null>(null);
+  
+  // State pentru Editare
+  isEditMode = signal(false);
+  editingEmployeeId = signal<number | null>(null);
   
   newEmployee = {
     firstName: '',
@@ -29,7 +33,7 @@ export class App implements OnInit {
 
   // Statistici calculate automat
   totalEmployees = computed(() => this.employees().length);
-  totalBudget = computed(() => this.employees().reduce((acc, emp) => acc + emp.salary, 0));
+  totalBudget = computed(() => this.employees().reduce((acc, emp) => acc + (emp.salary || 0), 0));
   avgSalary = computed(() => this.totalEmployees() > 0 ? this.totalBudget() / this.totalEmployees() : 0);
 
   ngOnInit(): void {
@@ -37,25 +41,40 @@ export class App implements OnInit {
   }
 
   loadEmployees() {
-  this.employeeService.getEmployees().subscribe({
-    next: (data: any) => {
-      console.log('Date de la server:', data);
-      // Dacă datele sunt înfășurate în "content", folosim data.content
-      const employeesArray = Array.isArray(data) ? data : (data.content || []);
-      this.employees.set(employeesArray);
-    },
-    error: (err) => console.error('Eroare API:', err)
-  });
-}
+    this.employeeService.getEmployees().subscribe({
+      next: (data: any) => {
+        const employeesArray = Array.isArray(data) ? data : (data.content || []);
+        this.employees.set(employeesArray);
+      },
+      error: (err) => console.error('Eroare API:', err)
+    });
+  }
 
   // Gestiune Modal
   openAddModal() {
+    this.isEditMode.set(false);
+    this.editingEmployeeId.set(null);
+    this.resetForm();
+    this.isModalOpen.set(true);
+  }
+
+  openEditModal(employee: Employee) {
+    this.isEditMode.set(true);
+    this.editingEmployeeId.set(employee.id || null);
+    
+    // Clonăm obiectul pentru a nu modifica direct în listă înainte de salvare
+    this.newEmployee = { 
+      ...employee, 
+      // Ne asigurăm că data este în formatul corect pentru input type="date"
+      hireDate: employee.hireDate ? new Date(employee.hireDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
+    };
+    
     this.isModalOpen.set(true);
   }
 
   closeModal() {
     this.isModalOpen.set(false);
-    this.errorMessage.set(null); // Resetăm eroarea când închidem modalul
+    this.errorMessage.set(null);
     this.resetForm();
   }
 
@@ -78,25 +97,40 @@ export class App implements OnInit {
     input.value = cleanedValue;
   }
 
-  // CRUD Actions
+  // CRUD Actions unificate
   saveEmployee() {
-    this.errorMessage.set(null); // Resetăm eroarea la începutul salvării
+    this.errorMessage.set(null);
 
-    this.employeeService.addEmployee(this.newEmployee as Employee).subscribe({
-      next: (addedEmployee) => {
-        this.employees.update(prev => [...prev, addedEmployee]);
-        this.closeModal();
-      },
-      error: (err) => {
-        // Tratăm erorile de unicitate (Duplicate Entry)
-        if (err.status === 500 || err.status === 409) {
-          this.errorMessage.set('Identity Conflict: Email or Phone already exists in the system.');
-        } else {
-          this.errorMessage.set('System Error: Could not deploy talent.');
-        }
-        console.error('Save Error:', err);
-      }
-    });
+    if (this.isEditMode() && this.editingEmployeeId()) {
+      // Logica pentru UPDATE
+      this.employeeService.updateEmployee(this.editingEmployeeId()!, this.newEmployee as Employee).subscribe({
+        next: (updatedEmployee) => {
+          this.employees.update(prev => 
+            prev.map(emp => emp.id === updatedEmployee.id ? updatedEmployee : emp)
+          );
+          this.closeModal();
+        },
+        error: (err) => this.handleBackendError(err)
+      });
+    } else {
+      // Logica pentru CREATE (originală)
+      this.employeeService.addEmployee(this.newEmployee as Employee).subscribe({
+        next: (addedEmployee) => {
+          this.employees.update(prev => [...prev, addedEmployee]);
+          this.closeModal();
+        },
+        error: (err) => this.handleBackendError(err)
+      });
+    }
+  }
+
+  private handleBackendError(err: any) {
+    if (err.status === 500 || err.status === 409) {
+      this.errorMessage.set('Identity Conflict: Email or Phone already exists in the system.');
+    } else {
+      this.errorMessage.set('System Error: Operation failed.');
+    }
+    console.error('Operation Error:', err);
   }
 
   deleteEmployee(id: number) {
@@ -115,6 +149,7 @@ export class App implements OnInit {
   }
 
   openQuickActions(id: number) {
+    // Putem păstra asta pentru un meniu dropdown sau direct ștergere
     this.deleteEmployee(id);
   }
 }

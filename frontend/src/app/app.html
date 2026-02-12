@@ -30,25 +30,36 @@
 
     @for (emp of employees(); track emp.id) {
       <div class="bento-card" 
-            (click)="viewEmployeeProfile(emp.id!)"
             style="position: relative; cursor: pointer; overflow: hidden;">
         
-        <button (click)="$event.stopPropagation(); openQuickActions(emp.id!)" 
-                style="position: absolute; top: 15px; right: 15px; background: none; border: none; color: #475569; cursor: pointer; padding: 5px; z-index: 10;"
-                onmouseover="this.style.color='#6366f1'"
-                onmouseout="this.style.color='#475569'">
-          <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-            <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
-          </svg>
-        </button>
+        <div style="position: absolute; top: 15px; right: 15px; display: flex; gap: 8px; z-index: 10;">
+          <button (click)="$event.stopPropagation(); openEditModal(emp)" 
+                  style="background: none; border: none; color: #475569; cursor: pointer; padding: 5px; transition: 0.2s;"
+                  onmouseover="this.style.color='#6366f1'"
+                  onmouseout="this.style.color='#475569'">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+          </button>
 
-        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
+          <button (click)="$event.stopPropagation(); deleteEmployee(emp.id!)" 
+                  style="background: none; border: none; color: #475569; cursor: pointer; padding: 5px; transition: 0.2s;"
+                  onmouseover="this.style.color='#ef4444'"
+                  onmouseout="this.style.color='#475569'">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div (click)="viewEmployeeProfile(emp.id!)" style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
            <div style="width: 52px; height: 52px; background: linear-gradient(135deg, #6366f1, #a855f7); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 800; color: white; font-size: 1.2rem; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);">
               {{ emp.firstName ? emp.firstName[0] : '?' }}
            </div>
            <div>
               <h3 style="margin: 0; font-size: 1.15rem; color: #f8fafc; font-weight: 700;">{{ emp.firstName }} {{ emp.lastName }}</h3>
               <p style="margin: 0; color: #64748b; font-size: 0.85rem; font-weight: 500;">{{ emp.position }}</p>
+              <p style="margin: 2px 0 0 0; color: #475569; font-size: 0.7rem; font-family: 'JetBrains Mono', monospace;">{{ emp.email }}</p>
            </div>
         </div>
         
@@ -67,7 +78,9 @@
   <div class="bento-card" style="width: 100%; max-width: 550px; background: #0f172a; border: 1px solid rgba(255,255,255,0.1); padding: 40px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8);">
     
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-      <h2 style="margin: 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -1px; color: white;">INITIALIZE TALENT<span style="color: #6366f1;">.</span></h2>
+      <h2 style="margin: 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -1px; color: white;">
+        {{ isEditMode() ? 'UPDATE RECORDS' : 'INITIALIZE TALENT' }}<span style="color: #6366f1;">.</span>
+      </h2>
       <button (click)="closeModal()" style="background: none; border: none; color: #475569; cursor: pointer; font-size: 1.8rem; line-height: 1;">&times;</button>
     </div>
 
@@ -120,7 +133,9 @@
 
         <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 2fr; gap: 15px;">
           <button type="button" (click)="closeModal()" style="background: transparent; border: 1px solid #334155; color: #94a3b8; padding: 14px; border-radius: 12px; cursor: pointer; font-weight: 600; transition: 0.2s;">Cancel</button>
-          <button type="submit" [disabled]="!empForm.form.valid" style="background: #6366f1; border: none; color: white; padding: 14px; border-radius: 12px; cursor: pointer; font-weight: 700; box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);" [style.opacity]="empForm.form.valid ? '1' : '0.5'">Deploy to System</button>
+          <button type="submit" [disabled]="!empForm.form.valid" style="background: #6366f1; border: none; color: white; padding: 14px; border-radius: 12px; cursor: pointer; font-weight: 700; box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);" [style.opacity]="empForm.form.valid ? '1' : '0.5'">
+            {{ isEditMode() ? 'Save Changes' : 'Deploy to System' }}
+          </button>
         </div>
 
       </div>

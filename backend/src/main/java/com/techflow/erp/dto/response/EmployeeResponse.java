@@ -13,4 +13,5 @@ public class EmployeeResponse {
     private String email;
     private String position;
     private BigDecimal salary;
+    private String phone;
 }

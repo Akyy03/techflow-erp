@@ -34,4 +34,10 @@ public class EmployeeController {
         // Returnăm status 201 Created și obiectul salvat
         return new ResponseEntity<>(newEmployee, HttpStatus.CREATED);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<EmployeeResponse> updateEmployee(@PathVariable Long id, @RequestBody Employee employeeDetails) {
+        EmployeeResponse updatedEmployee = employeeService.updateEmployee(id, employeeDetails);
+        return ResponseEntity.ok(updatedEmployee);
+    }
 }
