@@ -1,35 +1,110 @@
 <div style="padding: 50px; max-width: 1400px; margin: 0 auto;">
   
-  <header style="margin-bottom: 40px;">
-    <h1 style="font-size: 3rem; font-weight: 900; letter-spacing: -2px;">
-      TECHFLOW<span style="color: #6366f1;">.</span>
-    </h1>
-    <p style="color: #94a3b8; font-size: 1.1rem;">v21 Quantum Interface</p>
+  <header style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end;">
+    <div>
+      <h1 style="font-size: 3rem; font-weight: 900; letter-spacing: -2px; margin: 0;">
+        TECHFLOW<span style="color: #6366f1;">.</span>
+      </h1>
+      <p style="color: #94a3b8; font-size: 1.1rem; margin: 5px 0 0 0;">v21 Quantum Interface</p>
+    </div>
+    <div style="text-align: right; color: #475569; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
+      Node Status: <span style="color: #10b981;">Online</span>
+    </div>
   </header>
 
   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
     
-    <div class="bento-card" style="grid-column: span 2;">
-       <p style="color: #64748b; font-size: 0.75rem; font-weight: 800; text-transform: uppercase;">Budget Allocation</p>
-       <h2 style="font-size: 2.5rem; margin-top: 15px;">{{ totalBudget() | currency:'EUR' }}</h2>
+    <div class="bento-card" style="grid-column: span 2; display: flex; flex-direction: column; justify-content: center;">
+       <p style="color: #64748b; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; margin: 0;">Budget Allocation</p>
+       <h2 style="font-size: 3rem; margin-top: 10px; font-weight: 300;">{{ totalBudget() | currency:'EUR' }}</h2>
+    </div>
+
+    <div class="bento-card" 
+         (click)="openAddModal()"
+         style="display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px dashed rgba(99, 102, 241, 0.3); cursor: pointer; transition: 0.3s;"
+         onmouseover="this.style.borderColor='#6366f1'; this.style.background='rgba(99, 102, 241, 0.05)'"
+         onmouseout="this.style.borderColor='rgba(99, 102, 241, 0.3)'; this.style.background='transparent'">
+      <div style="font-size: 2.5rem; color: #6366f1; font-weight: 200;">+</div>
+      <p style="color: #6366f1; font-weight: 700; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; margin-top: 5px;">Add New Talent</p>
     </div>
 
     @for (emp of employees(); track emp.id) {
-      <div class="bento-card">
-         <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
-            <div style="width: 50px; height: 50px; background: #6366f1; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold;">
-               {{ emp.firstName[0] }}
-            </div>
-            <div>
-               <h3 style="margin: 0; font-size: 1.2rem;">{{ emp.firstName }} {{ emp.lastName }}</h3>
-               <p style="margin: 0; color: #94a3b8; font-size: 0.9rem;">{{ emp.position }}</p>
-            </div>
-         </div>
-         <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; display: flex; justify-content: space-between;">
-            <span style="color: #818cf8; font-family: monospace;">{{ emp.salary | currency:'EUR' }}</span>
-            <span style="color: #475569; font-size: 0.7rem;">ID: #0{{ emp.id }}</span>
-         </div>
+      <div class="bento-card" 
+           (click)="viewEmployeeProfile(emp.id!)"
+           style="position: relative; cursor: pointer; overflow: hidden;">
+        
+        <button (click)="$event.stopPropagation(); openQuickActions(emp.id!)" 
+                style="position: absolute; top: 15px; right: 15px; background: none; border: none; color: #475569; cursor: pointer; padding: 5px; z-index: 10;"
+                onmouseover="this.style.color='#6366f1'"
+                onmouseout="this.style.color='#475569'">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+          </svg>
+        </button>
+
+        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
+           <div style="width: 52px; height: 52px; background: linear-gradient(135deg, #6366f1, #a855f7); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 800; color: white; font-size: 1.2rem; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);">
+              {{ emp.firstName[0] }}
+           </div>
+           <div>
+              <h3 style="margin: 0; font-size: 1.15rem; color: #f8fafc; font-weight: 700;">{{ emp.firstName }} {{ emp.lastName }}</h3>
+              <p style="margin: 0; color: #64748b; font-size: 0.85rem; font-weight: 500;">{{ emp.position }}</p>
+           </div>
+        </div>
+        
+        <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; display: flex; justify-content: space-between; align-items: center;">
+           <span style="color: #818cf8; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; font-weight: 600;">{{ emp.salary | currency:'EUR' }}</span>
+           <span style="color: #334155; font-size: 0.65rem; font-weight: 700; letter-spacing: 1px;">REF: #0{{ emp.id }}</span>
+        </div>
       </div>
     }
+  </div>
+</div>
+
+<div *ngIf="isModalOpen()" 
+     style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(12px); background: rgba(0,0,0,0.7);">
+  
+  <div class="bento-card" style="width: 100%; max-width: 450px; background: #0f172a; border: 1px solid rgba(255,255,255,0.1); padding: 40px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8);">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+      <h2 style="margin: 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -1px; color: white;">NEW TALENT<span style="color: #6366f1;">.</span></h2>
+      <button (click)="closeModal()" style="background: none; border: none; color: #475569; cursor: pointer; font-size: 1.8rem; line-height: 1;">&times;</button>
+    </div>
+
+    <form (ngSubmit)="saveEmployee()" #empForm="ngForm">
+      <div style="display: grid; gap: 20px;">
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+          <div>
+            <label style="display: block; font-size: 0.65rem; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">First Name</label>
+            <input [(ngModel)]="newEmployee.firstName" name="firstName" required style="width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 12px; color: white; outline: none;" placeholder="John">
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.65rem; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">Last Name</label>
+            <input [(ngModel)]="newEmployee.lastName" name="lastName" required style="width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 12px; color: white; outline: none;" placeholder="Doe">
+          </div>
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 0.65rem; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">Position</label>
+          <input [(ngModel)]="newEmployee.position" name="position" required style="width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 12px; color: white; outline: none;" placeholder="Senior Software Engineer">
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 0.65rem; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">Salary (EUR)</label>
+          <input [(ngModel)]="newEmployee.salary" name="salary" type="number" required style="width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 12px; color: white; outline: none;">
+        </div>
+
+        <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 2fr; gap: 15px;">
+          <button type="button" (click)="closeModal()" style="background: transparent; border: 1px solid #334155; color: #94a3b8; padding: 14px; border-radius: 12px; cursor: pointer; font-weight: 600; transition: 0.2s;">Cancel</button>
+          <button type="submit" [disabled]="!empForm.form.valid" 
+                  style="background: #6366f1; border: none; color: white; padding: 14px; border-radius: 12px; cursor: pointer; font-weight: 700; box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4); opacity: 1;"
+                  [style.opacity]="empForm.form.valid ? '1' : '0.5'">
+            Initialize Talent
+          </button>
+        </div>
+
+      </div>
+    </form>
   </div>
 </div>
