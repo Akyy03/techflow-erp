@@ -1,0 +1,8 @@
+<div class="login-container">
+  <form (ngSubmit)="onLogin()" #loginForm="ngForm">
+    <h2>TechFlow ERP Login</h2>
+    <input type="email" name="email" [(ngModel)]="credentials.email" placeholder="Email" required>
+    <input type="password" name="password" [(ngModel)]="credentials.password" placeholder="Password" required>
+    <button type="submit" [disabled]="!loginForm.valid">Login</button>
+  </form>
+</div>
