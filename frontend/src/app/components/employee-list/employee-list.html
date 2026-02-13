@@ -9,45 +9,55 @@
     </div>
     
     <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
-  <div style="color: #475569; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 6px;">
-    <span style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981;"></span>
-    Node Status: Online
-  </div>
-  
-  <button (click)="logout()" 
-          [style.background]="showLogoutConfirm() ? 'rgba(239, 68, 68, 0.3)' : 'rgba(239, 68, 68, 0.1)'"
-          [style.border-color]="showLogoutConfirm() ? '#ef4444' : 'rgba(239, 68, 68, 0.2)'"
-          style="color: #f87171; padding: 4px 12px; border-radius: 6px; cursor: pointer; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); outline: none; min-width: 130px;">
-    {{ showLogoutConfirm() ? 'Are you sure?' : 'Disconnect Session [X]' }}
-  </button>
-  </div>
-
+      <div style="color: #475569; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 6px;">
+        <span style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981;"></span>
+        Node Status: Online
+      </div>
+      
+      <button (click)="logout()" 
+              [style.background]="showLogoutConfirm() ? 'rgba(239, 68, 68, 0.3)' : 'rgba(239, 68, 68, 0.1)'"
+              [style.border-color]="showLogoutConfirm() ? '#ef4444' : 'rgba(239, 68, 68, 0.2)'"
+              style="color: #f87171; padding: 4px 12px; border-radius: 6px; cursor: pointer; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); outline: none; min-width: 130px;">
+        {{ showLogoutConfirm() ? 'Are you sure?' : 'Disconnect Session [X]' }}
+      </button>
+    </div>
   </header>
+
+  <div style="margin-bottom: 30px; position: relative; max-width: 500px;">
+    <span style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #6366f1; font-weight: 800; font-size: 0.8rem; pointer-events: none;">
+      SEARCH_
+    </span>
+    <input type="text" 
+           (input)="onSearch($event)"
+           placeholder="Identify talent by name, position or email..." 
+           style="width: 100%; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 12px; padding: 12px 12px 12px 85px; color: white; font-size: 0.9rem; outline: none; transition: 0.3s; box-shadow: 0 4px 20px rgba(0,0,0,0.2);"
+           onfocus="this.style.borderColor='#6366f1'; this.style.background='rgba(15, 23, 42, 0.9)'"
+           onblur="this.style.borderColor='rgba(99, 102, 241, 0.2)'; this.style.background='rgba(15, 23, 42, 0.6)'">
+  </div>
 
   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
     
     <div class="bento-card" style="grid-column: span 2; display: flex; flex-direction: column; justify-content: center;">
-   <p style="color: #64748b; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; margin: 0;">Total Budget Allocation</p>
-   <h2 style="font-size: 3rem; margin-top: 10px; font-weight: 300;">{{ totalBudget() | currency:'EUR' }}</h2>
-   <p style="color: #6366f1; font-size: 0.7rem; font-weight: 600; margin-top: 5px;">
-     Avg. per talent: {{ avgSalary() | currency:'EUR' }}
-   </p>
-  </div>
+      <p style="color: #64748b; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; margin: 0;">Total Budget Allocation</p>
+      <h2 style="font-size: 3rem; margin-top: 10px; font-weight: 300;">{{ totalBudget() | currency:'EUR' }}</h2>
+      <p style="color: #6366f1; font-size: 0.7rem; font-weight: 600; margin-top: 5px;">
+        Avg. per talent: {{ avgSalary() | currency:'EUR' }}
+      </p>
+    </div>
 
     @if (userRole() === 'ADMIN') {
-    <div class="bento-card" 
-         (click)="openAddModal()"
-         style="display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px dashed rgba(99, 102, 241, 0.3); cursor: pointer; transition: 0.3s;"
-         onmouseover="this.style.borderColor='#6366f1'; this.style.background='rgba(99, 102, 241, 0.05)'"
-         onmouseout="this.style.borderColor='rgba(99, 102, 241, 0.3)'; this.style.background='transparent'">
-      <div style="font-size: 2.5rem; color: #6366f1; font-weight: 200;">+</div>
-      <p style="color: #6366f1; font-weight: 700; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; margin-top: 5px;">Add New Talent</p>
-    </div>
-  }
-
-    @for (emp of employees(); track emp.id) {
       <div class="bento-card" 
-            style="position: relative; cursor: pointer; overflow: hidden;">
+           (click)="openAddModal()"
+           style="display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px dashed rgba(99, 102, 241, 0.3); cursor: pointer; transition: 0.3s;"
+           onmouseover="this.style.borderColor='#6366f1'; this.style.background='rgba(99, 102, 241, 0.05)'"
+           onmouseout="this.style.borderColor='rgba(99, 102, 241, 0.3)'; this.style.background='transparent'">
+        <div style="font-size: 2.5rem; color: #6366f1; font-weight: 200;">+</div>
+        <p style="color: #6366f1; font-weight: 700; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; margin-top: 5px;">Add New Talent</p>
+      </div>
+    }
+
+    @for (emp of filteredEmployees(); track emp.id) {
+      <div class="bento-card" style="position: relative; cursor: pointer; overflow: hidden;">
         
         <div style="position: absolute; top: 15px; right: 15px; display: flex; gap: 8px; z-index: 10;">
           <button (click)="$event.stopPropagation(); openEditModal(emp)" 
@@ -84,6 +94,11 @@
            <span style="color: #818cf8; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; font-weight: 600;">{{ emp.salary | currency:'EUR' }}</span>
            <span style="color: #334155; font-size: 0.65rem; font-weight: 700; letter-spacing: 1px;">REF: #0{{ emp.id }}</span>
         </div>
+      </div>
+    } @empty {
+      <div style="grid-column: 1 / -1; text-align: center; padding: 60px; background: rgba(15, 23, 42, 0.3); border-radius: 20px; border: 1px dashed rgba(99, 102, 241, 0.2);">
+        <p style="color: #64748b; font-size: 1.1rem; margin: 0;">No talent matching <span style="color: #6366f1; font-weight: 700;">"{{ searchQuery() }}"</span> found in Quantum Records.</p>
+        <button (click)="searchQuery.set(''); (onSearch($any({target:{value:''}})))" style="margin-top: 15px; background: none; border: none; color: #6366f1; cursor: pointer; font-weight: 700; text-decoration: underline;">Clear Search</button>
       </div>
     }
   </div>

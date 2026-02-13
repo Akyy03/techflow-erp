@@ -30,9 +30,9 @@ export class EmployeeService {
   }
 
   // Adaugă asta în clasa EmployeeService
-updateEmployee(id: number, employee: Employee): Observable<Employee> {
-  return this.http.put<Employee>(`${this.apiUrl}/${id}`, employee);
-}
+  updateEmployee(id: number, employee: Employee): Observable<Employee> {
+    return this.http.put<Employee>(`${this.apiUrl}/${id}`, employee);
+  }
 
   deleteEmployee(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);

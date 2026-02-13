@@ -15,28 +15,15 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor // Acesta generează constructorul pentru câmpurile final
+@RequiredArgsConstructor
 public class EmployeeService {
 
-    // Am scos @Autowired și am lăsat final (Lombok face injecția prin constructor acum)
     private final EmployeeRepository employeeRepository;
     private final PasswordEncoder passwordEncoder;
 
-    // AM ȘTERS constructorul manual care se bătea cu @RequiredArgsConstructor (de aici era eroarea cu roșu)
-
     public List<EmployeeResponse> getAllEmployees() {
         return employeeRepository.findAllWithUser().stream()
-                .map(emp -> new EmployeeResponse(
-                        emp.getId(),
-                        emp.getFirstName(),
-                        emp.getLastName(),
-                        (emp.getUser() != null && emp.getUser().getEmail() != null)
-                                ? emp.getUser().getEmail()
-                                : "no-email@techflow.com",
-                        emp.getPosition(),
-                        emp.getSalary(),
-                        emp.getPhone()
-                ))
+                .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
@@ -49,25 +36,17 @@ public class EmployeeService {
 
     @Transactional
     public Employee addEmployee(Employee employee) {
+        // Dacă angajatul nu are un User asociat, îl creăm acum
         if (employee.getUser() == null) {
             User newUser = new User();
             newUser.setEmail(employee.getEmail());
-
-            // FIX: Generăm și criptăm o parolă random pentru a respecta NOT NULL în DB
-            String rawPassword = UUID.randomUUID().toString();
-            newUser.setPassword(passwordEncoder.encode(rawPassword));
-
+            // Generăm o parolă random sigură
+            newUser.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
             newUser.setRole(Role.EMPLOYEE);
             newUser.setActive(true);
-
             employee.setUser(newUser);
-        } else if (employee.getUser().getEmail() == null && employee.getEmail() != null) {
+        } else if (employee.getUser().getEmail() == null) {
             employee.getUser().setEmail(employee.getEmail());
-
-            // Siguranță: dacă user-ul vine fără parolă, îi punem una
-            if (employee.getUser().getPassword() == null) {
-                employee.getUser().setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
-            }
         }
 
         return employeeRepository.save(employee);
@@ -76,27 +55,37 @@ public class EmployeeService {
     @Transactional
     public EmployeeResponse updateEmployee(Long id, Employee empDetails) {
         Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Employee not found"));
+                .orElseThrow(() -> new RuntimeException("Employee not found with id: " + id));
 
+        // Actualizăm câmpurile de bază
         employee.setFirstName(empDetails.getFirstName());
         employee.setLastName(empDetails.getLastName());
         employee.setPosition(empDetails.getPosition());
         employee.setSalary(empDetails.getSalary());
+        employee.setPhone(empDetails.getPhone());
 
+        // Actualizăm email-ul în entitatea User asociată
         if (employee.getUser() != null && empDetails.getEmail() != null) {
             employee.getUser().setEmail(empDetails.getEmail());
         }
 
         Employee updated = employeeRepository.save(employee);
+        return mapToResponse(updated);
+    }
+
+    private EmployeeResponse mapToResponse(Employee emp) {
+        String email = (emp.getUser() != null && emp.getUser().getEmail() != null)
+                ? emp.getUser().getEmail()
+                : "no-email@techflow.com";
 
         return new EmployeeResponse(
-                updated.getId(),
-                updated.getFirstName(),
-                updated.getLastName(),
-                updated.getUser() != null ? updated.getUser().getEmail() : "no-email",
-                updated.getPosition(),
-                updated.getSalary(),
-                updated.getPhone()
+                emp.getId(),
+                emp.getFirstName(),
+                emp.getLastName(),
+                email,
+                emp.getPosition(),
+                emp.getSalary(),
+                emp.getPhone()
         );
     }
 }
