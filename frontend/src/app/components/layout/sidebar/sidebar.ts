@@ -8,7 +8,7 @@ import { AuthService } from '../../../services/auth'; // <--- Importă serviciul
   standalone: true,
   imports: [RouterModule, CommonModule],
   templateUrl: './sidebar.html',
-  styleUrl: './sidebar.css'
+  styleUrl: './sidebar.css',
 })
 export class Sidebar {
   private router = inject(Router);
@@ -19,7 +19,7 @@ export class Sidebar {
   logout() {
     if (!this.showLogoutConfirm()) {
       this.showLogoutConfirm.set(true);
-      
+
       setTimeout(() => {
         this.showLogoutConfirm.set(false);
       }, 3000);

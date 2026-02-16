@@ -11,10 +11,10 @@ import { Projects } from './components/projects/projects';
 import { Leaves } from './components/leaves/leaves';
 
 export const routes: Routes = [
-  { 
-    path: 'login', 
-    component: LoginComponent, 
-    canActivate: [guestGuard] 
+  {
+    path: 'login',
+    component: LoginComponent,
+    canActivate: [guestGuard],
   },
   {
     path: '',
@@ -25,8 +25,8 @@ export const routes: Routes = [
       { path: 'employees', component: EmployeeListComponent },
       { path: 'projects', component: Projects },
       { path: 'leaves', component: Leaves },
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
-    ]
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+    ],
   },
-  { path: '**', redirectTo: 'login' }
+  { path: '**', redirectTo: 'login' },
 ];

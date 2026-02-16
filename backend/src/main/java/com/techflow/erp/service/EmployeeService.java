@@ -57,7 +57,7 @@ public class EmployeeService {
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Employee not found with id: " + id));
 
-        // 1. Validare email la update (dacă s-a schimbat)
+        // 1. Validare email la update
         if (empDetails.getEmail() != null) {
             validateEmailDomain(empDetails.getEmail());
             if (employee.getUser() != null) {
@@ -65,13 +65,17 @@ public class EmployeeService {
             }
         }
 
-        // 2. Actualizare câmpuri (folosind datele primite)
+        // 2. Actualizare câmpuri de bază
         employee.setFirstName(empDetails.getFirstName());
         employee.setLastName(empDetails.getLastName());
         employee.setPosition(empDetails.getPosition());
         employee.setSalary(empDetails.getSalary());
         employee.setPhone(empDetails.getPhone());
         employee.setHireDate(empDetails.getHireDate());
+
+        if (empDetails.getDepartment() != null) {
+            employee.setDepartment(empDetails.getDepartment());
+        }
 
         Employee updated = employeeRepository.save(employee);
         return mapToResponse(updated);
@@ -108,7 +112,8 @@ public class EmployeeService {
                 email,
                 emp.getPosition(),
                 emp.getSalary(),
-                emp.getPhone()
+                emp.getPhone(),
+                emp.getDepartment() != null ? emp.getDepartment().getName() : "No Department"
         );
     }
 }

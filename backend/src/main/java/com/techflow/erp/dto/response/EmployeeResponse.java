@@ -2,6 +2,7 @@ package com.techflow.erp.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+
 import java.math.BigDecimal;
 
 @Data
@@ -14,4 +15,5 @@ public class EmployeeResponse {
     private String position;
     private BigDecimal salary;
     private String phone;
+    private String departmentName;
 }

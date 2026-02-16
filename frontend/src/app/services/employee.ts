@@ -2,8 +2,14 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+export interface Department {
+  id?: number;
+  name: string;
+  description?: string;
+}
+
 export interface Employee {
-  id?: number; // Optional pentru că la adăugare nu avem încă ID
+  id?: number;
   firstName: string;
   lastName: string;
   position: string;
@@ -11,25 +17,30 @@ export interface Employee {
   email: string;
   phone: string;
   hireDate: string;
+  departmentName?: string;
+  department?: Department;
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class EmployeeService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8080/api/employees'; // Verifică să fie URL-ul tău corect
+  private apiUrl = 'http://localhost:8080/api/employees';
+  private deptUrl = 'http://localhost:8080/api/departments';
 
   getEmployees(): Observable<Employee[]> {
     return this.http.get<Employee[]>(this.apiUrl);
   }
 
-  // ACEASTA ESTE METODA CARE LIPSEȘTE:
+  getDepartments(): Observable<Department[]> {
+    return this.http.get<Department[]>(this.deptUrl);
+  }
+
   addEmployee(employee: Employee): Observable<Employee> {
     return this.http.post<Employee>(this.apiUrl, employee);
   }
 
-  // Adaugă asta în clasa EmployeeService
   updateEmployee(id: number, employee: Employee): Observable<Employee> {
     return this.http.put<Employee>(`${this.apiUrl}/${id}`, employee);
   }

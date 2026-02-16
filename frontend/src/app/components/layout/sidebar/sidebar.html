@@ -1,11 +1,12 @@
 <div class="quantum-sidebar">
-  <div class="brand">
-    TECHFLOW<span>.</span>
-  </div>
+  <div class="brand">TECHFLOW<span>.</span></div>
 
   <nav class="nav-menu">
     <a routerLink="/dashboard" routerLinkActive="active-link" class="nav-item">
       <span class="icon">📊</span> Dashboard
+    </a>
+    <a routerLink="/departments" routerLinkActive="active-link" class="nav-item">
+      <span class="icon">🏢</span> Departments
     </a>
     <a routerLink="/employees" routerLinkActive="active-link" class="nav-item">
       <span class="icon">👥</span> Employees
@@ -18,10 +19,12 @@
     </a>
   </nav>
 
-  <button class="logout-btn" 
-          (click)="logout()"
-          [style.background]="showLogoutConfirm() ? 'rgba(239, 68, 68, 0.3)' : 'rgba(239, 68, 68, 0.1)'"
-          [style.border-color]="showLogoutConfirm() ? '#ef4444' : 'rgba(239, 68, 68, 0.2)'">
+  <button
+    class="logout-btn"
+    (click)="logout()"
+    [style.background]="showLogoutConfirm() ? 'rgba(239, 68, 68, 0.3)' : 'rgba(239, 68, 68, 0.1)'"
+    [style.border-color]="showLogoutConfirm() ? '#ef4444' : 'rgba(239, 68, 68, 0.2)'"
+  >
     {{ showLogoutConfirm() ? 'ARE YOU SURE?' : 'Disconnect Session [X]' }}
   </button>
 </div>

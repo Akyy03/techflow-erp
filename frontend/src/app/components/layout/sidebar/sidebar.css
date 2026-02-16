@@ -24,7 +24,9 @@
   letter-spacing: -1px;
 }
 
-.brand span { color: #6366f1; }
+.brand span {
+  color: #6366f1;
+}
 
 .nav-menu {
   display: flex;

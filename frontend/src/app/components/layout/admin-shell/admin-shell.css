@@ -4,7 +4,7 @@
 
 .main-content {
   flex: 1;
-  margin-left: 260px; /* Acesta este secretul: impinge continutul in dreapta sidebar-ului */
+  margin-left: 260px;
   min-height: 100vh;
   padding: 50px;
 }

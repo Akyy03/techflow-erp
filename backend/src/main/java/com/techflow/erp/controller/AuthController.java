@@ -1,10 +1,8 @@
 package com.techflow.erp.controller;
 
 import com.techflow.erp.config.JwtService;
-import com.techflow.erp.constant.Role;
 import com.techflow.erp.dto.request.LoginRequest;
 import com.techflow.erp.dto.response.AuthResponse;
-import com.techflow.erp.entity.User;
 import com.techflow.erp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "http://localhost:4200")
 public class AuthController {
 
-    private final UserRepository userRepository; // Va trebui să-l injectezi
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 

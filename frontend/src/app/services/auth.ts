@@ -6,7 +6,7 @@ import { Observable, tap } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private apiUrl = 'http://localhost:8080/api/v1/auth';
-  
+
   private router = inject(Router);
 
   constructor(private http: HttpClient) {}
@@ -17,21 +17,21 @@ export class AuthService {
         localStorage.setItem('token', response.token);
         localStorage.setItem('role', response.role);
         localStorage.setItem('email', response.email);
-      })
+      }),
     );
   }
 
-logout() {
-  localStorage.clear();
-  sessionStorage.clear();
+  logout() {
+    localStorage.clear();
+    sessionStorage.clear();
 
-  window.location.href = '/login';
-}
+    window.location.href = '/login';
+  }
 
   isLoggedIn(): boolean {
-  const token = localStorage.getItem('token');
-  return !!token && token !== 'null' && token !== 'undefined';
-}
+    const token = localStorage.getItem('token');
+    return !!token && token !== 'null' && token !== 'undefined';
+  }
 
   getRole(): string | null {
     return localStorage.getItem('role');

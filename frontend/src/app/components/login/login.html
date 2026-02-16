@@ -9,33 +9,42 @@
       <div class="input-group">
         <label>Corporate Identity</label>
         <div class="input-wrapper">
-          <input 
-            type="email" 
-            [(ngModel)]="email" 
+          <input
+            type="email"
+            [(ngModel)]="email"
             (input)="onInput()"
-            name="email" 
-            placeholder="name@techflow.com" 
+            name="email"
+            placeholder="name@techflow.com"
             required
-            autocomplete="email">
+            autocomplete="email"
+          />
         </div>
       </div>
 
       <div class="input-group">
         <label>Access Key</label>
         <div class="input-wrapper">
-          <input 
-            type="password" 
-            [(ngModel)]="password" 
+          <input
+            type="password"
+            [(ngModel)]="password"
             (input)="onInput()"
-            name="password" 
-            placeholder="••••••••" 
+            name="password"
+            placeholder="••••••••"
             required
-            autocomplete="current-password">
+            autocomplete="current-password"
+          />
         </div>
       </div>
 
       <div *ngIf="errorMessage" class="error-message">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <circle cx="12" cy="12" r="10"></circle>
           <line x1="12" y1="8" x2="12" y2="12"></line>
           <line x1="12" y1="16" x2="12.01" y2="16"></line>
@@ -43,11 +52,12 @@
         {{ errorMessage }}
       </div>
 
-      <button 
-        type="submit" 
-        class="login-button" 
+      <button
+        type="submit"
+        class="login-button"
         [disabled]="!loginForm.form.valid"
-        [class.btn-disabled]="!loginForm.form.valid">
+        [class.btn-disabled]="!loginForm.form.valid"
+      >
         INITIALIZE SESSION_
       </button>
     </form>

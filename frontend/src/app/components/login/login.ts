@@ -8,8 +8,8 @@ import { AuthService } from '../../services/auth';
   selector: 'app-login',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './login.html', 
-  styleUrls: ['./login.css']
+  templateUrl: './login.html',
+  styleUrls: ['./login.css'],
 })
 export class LoginComponent {
   email = '';
@@ -34,19 +34,20 @@ export class LoginComponent {
 
     this.authService.login(credentials).subscribe({
       next: (res: any) => {
-        this.router.navigate(['/dashboard']); 
+        this.router.navigate(['/dashboard']);
       },
       error: (err: any) => {
         // RESETĂM mesajul forțat și îl repunem după un ciclu de randare (Tick)
         // Asta garantează că animația/mesajul reapare chiar dacă eroarea e aceeași
-        this.errorMessage = ''; 
-        
+        this.errorMessage = '';
+
         setTimeout(() => {
-          this.errorMessage = (err?.error && typeof err.error === 'string') 
-                            ? err.error 
-                            : 'ACCESS_DENIED: Invalid credentials or offline node.';
+          this.errorMessage =
+            err?.error && typeof err.error === 'string'
+              ? err.error
+              : 'ACCESS_DENIED: Invalid credentials or offline node.';
         }, 50); // 50ms e suficient pentru ca DOM-ul să proceseze dispariția
-      }
+      },
     });
   }
 }
