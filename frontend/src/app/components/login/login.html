@@ -1,8 +1,59 @@
 <div class="login-container">
-  <form (ngSubmit)="onLogin()" #loginForm="ngForm">
-    <h2>TechFlow ERP Login</h2>
-    <input type="email" name="email" [(ngModel)]="credentials.email" placeholder="Email" required>
-    <input type="password" name="password" [(ngModel)]="credentials.password" placeholder="Password" required>
-    <button type="submit" [disabled]="!loginForm.valid">Login</button>
-  </form>
+  <div class="login-box">
+    <div class="login-header">
+      <h1 class="brand-logo">TECHFLOW<span class="dot">.</span></h1>
+      <p class="system-status">Quantum Authentication Protocol</p>
+    </div>
+
+    <form (ngSubmit)="login()" class="login-form" #loginForm="ngForm">
+      <div class="input-group">
+        <label>Corporate Identity</label>
+        <div class="input-wrapper">
+          <input 
+            type="email" 
+            [(ngModel)]="email" 
+            (input)="onInput()"
+            name="email" 
+            placeholder="name@techflow.com" 
+            required
+            autocomplete="email">
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Access Key</label>
+        <div class="input-wrapper">
+          <input 
+            type="password" 
+            [(ngModel)]="password" 
+            (input)="onInput()"
+            name="password" 
+            placeholder="••••••••" 
+            required
+            autocomplete="current-password">
+        </div>
+      </div>
+
+      <div *ngIf="errorMessage" class="error-message">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        {{ errorMessage }}
+      </div>
+
+      <button 
+        type="submit" 
+        class="login-button" 
+        [disabled]="!loginForm.form.valid"
+        [class.btn-disabled]="!loginForm.form.valid">
+        INITIALIZE SESSION_
+      </button>
+    </form>
+
+    <div class="login-footer">
+      <p>Secure Node: <span>#77-α</span></p>
+    </div>
+  </div>
 </div>

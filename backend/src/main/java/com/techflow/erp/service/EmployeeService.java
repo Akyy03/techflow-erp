@@ -21,6 +21,8 @@ public class EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final PasswordEncoder passwordEncoder;
 
+    private static final String ALLOWED_DOMAIN = "@techflow.com";
+
     public List<EmployeeResponse> getAllEmployees() {
         return employeeRepository.findAllWithUser().stream()
                 .map(this::mapToResponse)
@@ -36,16 +38,14 @@ public class EmployeeService {
 
     @Transactional
     public Employee addEmployee(Employee employee) {
-        // Dacă angajatul nu are un User asociat, îl creăm acum
+        // 1. Validare Bulletproof pentru email
+        validateEmailDomain(employee.getEmail());
+
+        // 2. Logica de creare User (restrânsă pentru claritate)
         if (employee.getUser() == null) {
-            User newUser = new User();
-            newUser.setEmail(employee.getEmail());
-            // Generăm o parolă random sigură
-            newUser.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
-            newUser.setRole(Role.EMPLOYEE);
-            newUser.setActive(true);
+            User newUser = createAutomaticUser(employee.getEmail());
             employee.setUser(newUser);
-        } else if (employee.getUser().getEmail() == null) {
+        } else {
             employee.getUser().setEmail(employee.getEmail());
         }
 
@@ -57,26 +57,49 @@ public class EmployeeService {
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Employee not found with id: " + id));
 
-        // Actualizăm câmpurile de bază
+        // 1. Validare email la update (dacă s-a schimbat)
+        if (empDetails.getEmail() != null) {
+            validateEmailDomain(empDetails.getEmail());
+            if (employee.getUser() != null) {
+                employee.getUser().setEmail(empDetails.getEmail());
+            }
+        }
+
+        // 2. Actualizare câmpuri (folosind datele primite)
         employee.setFirstName(empDetails.getFirstName());
         employee.setLastName(empDetails.getLastName());
         employee.setPosition(empDetails.getPosition());
         employee.setSalary(empDetails.getSalary());
         employee.setPhone(empDetails.getPhone());
-
-        // Actualizăm email-ul în entitatea User asociată
-        if (employee.getUser() != null && empDetails.getEmail() != null) {
-            employee.getUser().setEmail(empDetails.getEmail());
-        }
+        employee.setHireDate(empDetails.getHireDate());
 
         Employee updated = employeeRepository.save(employee);
         return mapToResponse(updated);
     }
 
+    // --- METODE HELPER (Private) ---
+
+    private void validateEmailDomain(String email) {
+        if (email == null || !email.toLowerCase().endsWith(ALLOWED_DOMAIN)) {
+            throw new IllegalArgumentException("Identity Error: Email must belong to " + ALLOWED_DOMAIN);
+        }
+    }
+
+    private User createAutomaticUser(String email) {
+        User user = new User();
+        user.setEmail(email);
+        // Generăm o parolă random sigură - utilizatorul o poate reseta ulterior
+        user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+        user.setRole(Role.EMPLOYEE);
+        user.setActive(true);
+        return user;
+    }
+
     private EmployeeResponse mapToResponse(Employee emp) {
-        String email = (emp.getUser() != null && emp.getUser().getEmail() != null)
-                ? emp.getUser().getEmail()
-                : "no-email@techflow.com";
+        // Folosim Optional pentru a evita multiplele verificări de null
+        String email = java.util.Optional.ofNullable(emp.getUser())
+                .map(User::getEmail)
+                .orElse("no-email" + ALLOWED_DOMAIN);
 
         return new EmployeeResponse(
                 emp.getId(),

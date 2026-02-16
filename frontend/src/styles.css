@@ -5,18 +5,16 @@
     background-color: #030712;
     color: white;
     margin: 0;
-    font-family: sans-serif;
+    font-family: 'Inter', sans-serif; /* Am trecut la Inter pentru un look mai modern */
   }
 
   /* --- ELIMINARE SCROLLBAR / SPIN-BUTTONS SALARIU --- */
-  /* Chrome, Safari, Edge, Opera */
   input::-webkit-outer-spin-button,
   input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
   }
 
-  /* Firefox */
   input[type=number] {
     -moz-appearance: textfield;
     appearance: textfield;
@@ -24,20 +22,61 @@
 }
 
 @layer components {
+  /* --- BENTO CARDS --- */
   .bento-card {
     display: block;
-    background-color: rgba(30, 41, 59, 0.8) !important; 
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    background-color: rgba(15, 23, 42, 0.6); 
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 1.5rem;
-    padding: 2rem !important; 
-    backdrop-filter: blur(10px);
-    transition: all 0.3s ease;
+    padding: 2rem; 
+    /* Am scos tranzitiile complexe ca sa fie mai stabil */
+    transition: transform 0.2s ease, border-color 0.2s ease;
     margin-bottom: 1rem;
   }
 
   .bento-card:hover {
-    background-color: rgba(51, 65, 85, 0.9) !important;
-    border-color: #6366f1 !important;
-    transform: translateY(-5px);
+    border-color: rgba(99, 102, 241, 0.5);
+    transform: translateY(-2px); /* Ridicare aproape insesizabila */
+  }
+
+  /* --- FORMULAR STATIC & HIGHLIGHT --- */
+  
+  .tf-label {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+  }
+
+  .tf-input {
+    width: 100%;
+    background-color: #1e293b !important; /* Fundal solid, nu mai e transparent, pentru stabilitate vizuala */
+    border: 1px solid #334155 !important;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: white;
+    font-size: 0.9375rem;
+    /* Eliminam orice tranzitie de miscare, lasam doar culorile */
+    transition: border-color 0.1s ease, box-shadow 0.1s ease;
+    outline: none !important;
+    display: block;
+  }
+
+  /* HIGHLIGHT-UL PUTERNIC (Quantum Focus) */
+  .tf-input:focus {
+    border-color: #6366f1 !important; /* Indigo clar */
+    background-color: #1e293b !important;
+    /* Un "glow" mai dens si mai putin difuz pentru a parea static si solid */
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.4) !important;
+  }
+
+  /* ELIMINARE ANIMAȚII MODAL (Forțăm formularul să apară instant) */
+  .modal-container, .modal-box {
+    animation: none !important;
+    transform: none !important;
+    transition: none !important;
   }
 }

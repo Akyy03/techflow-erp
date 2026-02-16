@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms'; 
 import { EmployeeService, Employee } from '../../services/employee';
@@ -9,6 +9,9 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './employee-list.html',
+  styleUrl: './employee-list.css',
+  // OnPush reduce lag-ul prin oprirea verificărilor inutile de fundal
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EmployeeListComponent implements OnInit {
   private router = inject(Router);
@@ -26,9 +29,9 @@ export class EmployeeListComponent implements OnInit {
 
   // Search & Session
   searchQuery = signal('');
-  showLogoutConfirm = signal(false);
   
-  newEmployee = {
+  // Obiectul pentru formular
+  newEmployee: any = {
     firstName: '',
     lastName: '',
     position: '',
@@ -39,7 +42,6 @@ export class EmployeeListComponent implements OnInit {
   };
 
   // --- CALCULATED DATA (Signals) ---
-  // Aici folosim filteredEmployees() pentru a calcula statisticile
   totalEmployees = computed(() => this.employees().length);
   totalBudget = computed(() => this.employees().reduce((acc, emp) => acc + (emp.salary || 0), 0));
   avgSalary = computed(() => this.totalEmployees() > 0 ? this.totalBudget() / this.totalEmployees() : 0);
@@ -64,7 +66,6 @@ export class EmployeeListComponent implements OnInit {
 
   // --- ACTIONS ---
 
-  // ACEASTA ESTE METODA CARE LIPSEA:
   onSearch(event: Event) {
     const input = event.target as HTMLInputElement;
     this.searchQuery.set(input.value);
@@ -80,17 +81,6 @@ export class EmployeeListComponent implements OnInit {
     });
   }
 
-  logout() {
-    if (!this.showLogoutConfirm()) {
-      this.showLogoutConfirm.set(true);
-      setTimeout(() => this.showLogoutConfirm.set(false), 3000);
-    } else {
-      localStorage.removeItem('token');
-      localStorage.removeItem('role');
-      this.router.navigate(['/login']);
-    }
-  }
-
   // --- MODAL MANAGEMENT ---
   openAddModal() {
     this.isEditMode.set(false);
@@ -102,6 +92,7 @@ export class EmployeeListComponent implements OnInit {
   openEditModal(employee: Employee) {
     this.isEditMode.set(true);
     this.editingEmployeeId.set(employee.id || null);
+    // Clonăm obiectul pentru a evita legăturile directe care pot cauza lag
     this.newEmployee = { 
       ...employee, 
       hireDate: employee.hireDate ? new Date(employee.hireDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
@@ -128,44 +119,41 @@ export class EmployeeListComponent implements OnInit {
   }
 
   validatePhone(event: any) {
-  const input = event.target;
-  const cleanedValue = input.value.replace(/[^0-9+]/g, '');
-  this.newEmployee.phone = cleanedValue;
-  input.value = cleanedValue;
-}
+    const input = event.target;
+    const cleanedValue = input.value.replace(/[^0-9+]/g, '');
+    this.newEmployee.phone = cleanedValue;
+    input.value = cleanedValue;
+  }
 
   // --- CRUD OPERATIONS ---
   saveEmployee() {
-  this.errorMessage.set(null);
-  
-  // Pregătim datele pentru trimitere
-  const employeeData: Employee = {
-    ...this.newEmployee,
-    id: this.editingEmployeeId() || undefined // Ne asigurăm că ID-ul ajunge la backend în modul Edit
-  };
+    this.errorMessage.set(null);
+    
+    const employeeData: Employee = {
+      ...this.newEmployee,
+      id: this.editingEmployeeId() || undefined
+    };
 
-  if (this.isEditMode() && this.editingEmployeeId()) {
-    // --- LOGICA PENTRU UPDATE ---
-    this.employeeService.updateEmployee(this.editingEmployeeId()!, employeeData).subscribe({
-      next: (updatedEmployee) => {
-        this.employees.update(prev => 
-          prev.map(emp => emp.id === updatedEmployee.id ? updatedEmployee : emp)
-        );
-        this.closeModal();
-      },
-      error: (err) => this.handleBackendError(err)
-    });
-  } else {
-    // --- LOGICA PENTRU CREATE ---
-    this.employeeService.addEmployee(employeeData).subscribe({
-      next: (addedEmployee) => {
-        this.employees.update(prev => [...prev, addedEmployee]);
-        this.closeModal();
-      },
-      error: (err) => this.handleBackendError(err)
-    });
+    if (this.isEditMode() && this.editingEmployeeId()) {
+      this.employeeService.updateEmployee(this.editingEmployeeId()!, employeeData).subscribe({
+        next: (updatedEmployee) => {
+          this.employees.update(prev => 
+            prev.map(emp => emp.id === updatedEmployee.id ? updatedEmployee : emp)
+          );
+          this.closeModal();
+        },
+        error: (err) => this.handleBackendError(err)
+      });
+    } else {
+      this.employeeService.addEmployee(employeeData).subscribe({
+        next: (addedEmployee) => {
+          this.employees.update(prev => [...prev, addedEmployee]);
+          this.closeModal();
+        },
+        error: (err) => this.handleBackendError(err)
+      });
+    }
   }
-}
 
   deleteEmployee(id: number) {
     if (confirm('Ești sigur că vrei să elimini acest talent din echipă?')) {
