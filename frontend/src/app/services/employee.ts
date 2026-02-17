@@ -17,6 +17,7 @@ export interface Employee {
   email: string;
   phone: string;
   hireDate: string;
+  role?: 'EMPLOYEE' | 'MANAGER';
   departmentName?: string;
   department?: Department;
 }

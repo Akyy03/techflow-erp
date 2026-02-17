@@ -362,3 +362,58 @@ button[title='Table View']:hover {
   border-color: rgba(239, 68, 68, 0.3);
   transform: scale(1.1);
 }
+
+.role-badge {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 800;
+  background: rgba(100, 116, 139, 0.1); /* Gri pentru Employee */
+  color: #64748b;
+  border: 1px solid rgba(100, 116, 139, 0.2);
+  cursor: help;
+}
+
+/* Container pentru nume și badge */
+.name-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Stilul de bază al badge-ului */
+.role-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 900;
+  cursor: help;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Indicator pentru Employee */
+.role-indicator.employee {
+  background: rgba(148, 163, 184, 0.1);
+  color: #94a3b8;
+}
+
+/* Indicator pentru Manager - Indigo Glow */
+.role-indicator.manager {
+  background: rgba(99, 102, 241, 0.2);
+  color: #818cf8;
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
+}
+
+.role-indicator:hover {
+  transform: scale(1.1);
+}

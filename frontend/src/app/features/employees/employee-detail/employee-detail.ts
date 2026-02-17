@@ -1,13 +1,13 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { EmployeeService } from '../../../services/employee';
-import { Employee } from '../../../services/employee';
+import { Employee, EmployeeService } from '../../../services/employee';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-employee-detail',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './employee-detail.html',
   styleUrl: './employee-detail.css',
 })
@@ -19,15 +19,13 @@ export class EmployeeDetailComponent implements OnInit {
   employee = signal<Employee | null>(null);
 
   ngOnInit() {
-    // Luăm ID-ul din URL
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-      // Chemăm service-ul (asigură-te că ai metoda getEmployeeById în service!)
       this.empService.getEmployeeById(+id).subscribe({
         next: (data) => this.employee.set(data),
         error: (err) => {
           console.error('Error fetching employee', err);
-          this.router.navigate(['/employees']); // Dacă nu există, înapoi la listă
+          this.router.navigate(['/employees']);
         },
       });
     }
@@ -50,5 +48,39 @@ export class EmployeeDetailComponent implements OnInit {
 
     const years = (diffDays / 365).toFixed(1);
     return `${years} years in company`;
+  }
+
+  changeRole(newRole: 'EMPLOYEE' | 'MANAGER') {
+    const currentEmp = this.employee();
+    if (!currentEmp || currentEmp.id === undefined) return;
+
+    const fullName = `${currentEmp.firstName} ${currentEmp.lastName}`;
+    const msg =
+      newRole === 'MANAGER'
+        ? `Elevate ${fullName} to Management level?`
+        : `Revoke management privileges for ${fullName}?`;
+
+    if (confirm(msg)) {
+      // Clonăm obiectul cu atenție
+      const updatedEmployee: Employee = {
+        ...currentEmp,
+        role: newRole,
+      };
+
+      console.log('Sending update to server:', updatedEmployee);
+
+      this.empService.updateEmployee(currentEmp.id, updatedEmployee).subscribe({
+        next: (res) => {
+          // Forțăm refresh-ul datelor din răspunsul serverului
+          this.employee.set(res);
+          // Dacă seniority tot dispare, înseamnă că 'res' vine de la server fără hireDate
+          console.log('Update successful, server returned:', res);
+        },
+        error: (err) => {
+          console.error('Full Error Object:', err);
+          alert(`System failure: ${err.message || 'Check backend logs.'}`);
+        },
+      });
+    }
   }
 }

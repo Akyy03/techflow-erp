@@ -59,4 +59,7 @@ public class Employee {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "department_id", nullable = false)
     private Department department;
+
+    @Transient
+    private String role;
 }

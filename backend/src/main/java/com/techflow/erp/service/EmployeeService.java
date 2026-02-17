@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -36,12 +37,16 @@ public class EmployeeService {
         employeeRepository.deleteById(id);
     }
 
+    public EmployeeResponse getEmployeeById(Long id) {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Employee not found with id: " + id));
+        return mapToResponse(employee);
+    }
+
     @Transactional
     public Employee addEmployee(Employee employee) {
-        // 1. Validare Bulletproof pentru email
         validateEmailDomain(employee.getEmail());
 
-        // 2. Logica de creare User (restrânsă pentru claritate)
         if (employee.getUser() == null) {
             User newUser = createAutomaticUser(employee.getEmail());
             employee.setUser(newUser);
@@ -57,7 +62,7 @@ public class EmployeeService {
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Employee not found with id: " + id));
 
-        // 1. Validare email la update
+        // 1. Validare email și update User Email
         if (empDetails.getEmail() != null) {
             validateEmailDomain(empDetails.getEmail());
             if (employee.getUser() != null) {
@@ -65,13 +70,26 @@ public class EmployeeService {
             }
         }
 
-        // 2. Actualizare câmpuri de bază
+        // 2. ACTUALIZARE ROL (Sincronizare cu tabelul Users)
+        if (empDetails.getRole() != null && employee.getUser() != null) {
+            try {
+                employee.getUser().setRole(Role.valueOf(empDetails.getRole()));
+            } catch (IllegalArgumentException e) {
+                // Dacă rolul trimis nu e valid în Enum, rămâne cel vechi sau dă eroare
+                System.err.println("Invalid role received: " + empDetails.getRole());
+            }
+        }
+
+        // 3. Actualizare câmpuri de bază
         employee.setFirstName(empDetails.getFirstName());
         employee.setLastName(empDetails.getLastName());
         employee.setPosition(empDetails.getPosition());
         employee.setSalary(empDetails.getSalary());
         employee.setPhone(empDetails.getPhone());
-        employee.setHireDate(empDetails.getHireDate());
+
+        if (empDetails.getHireDate() != null) {
+            employee.setHireDate(empDetails.getHireDate());
+        }
 
         if (empDetails.getDepartment() != null) {
             employee.setDepartment(empDetails.getDepartment());
@@ -92,7 +110,6 @@ public class EmployeeService {
     private User createAutomaticUser(String email) {
         User user = new User();
         user.setEmail(email);
-        // Generăm o parolă random sigură - utilizatorul o poate reseta ulterior
         user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
         user.setRole(Role.EMPLOYEE);
         user.setActive(true);
@@ -100,10 +117,14 @@ public class EmployeeService {
     }
 
     private EmployeeResponse mapToResponse(Employee emp) {
-        // Folosim Optional pentru a evita multiplele verificări de null
-        String email = java.util.Optional.ofNullable(emp.getUser())
+        String email = Optional.ofNullable(emp.getUser())
                 .map(User::getEmail)
-                .orElse("no-email" + ALLOWED_DOMAIN);
+                .orElse(emp.getEmail() != null ? emp.getEmail() : "no-email" + ALLOWED_DOMAIN);
+
+        // Extragem rolul din obiectul User asociat
+        String currentRole = Optional.ofNullable(emp.getUser())
+                .map(u -> u.getRole().name())
+                .orElse("EMPLOYEE");
 
         return new EmployeeResponse(
                 emp.getId(),
@@ -113,7 +134,9 @@ public class EmployeeService {
                 emp.getPosition(),
                 emp.getSalary(),
                 emp.getPhone(),
-                emp.getDepartment() != null ? emp.getDepartment().getName() : "No Department"
+                emp.getDepartment() != null ? emp.getDepartment().getName() : "No Department",
+                emp.getHireDate() != null ? emp.getHireDate().toString() : null, // Conversie LocalDate -> String
+                currentRole
         );
     }
 }
