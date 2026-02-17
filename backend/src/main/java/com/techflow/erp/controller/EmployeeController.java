@@ -2,6 +2,7 @@ package com.techflow.erp.controller;
 
 import com.techflow.erp.dto.response.EmployeeResponse;
 import com.techflow.erp.entity.Employee;
+import com.techflow.erp.repository.EmployeeRepository;
 import com.techflow.erp.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,10 +17,18 @@ import java.util.List;
 public class EmployeeController {
 
     private final EmployeeService employeeService;
+    private final EmployeeRepository employeeRepository;
 
     @GetMapping
     public List<EmployeeResponse> getEmployees() {
         return employeeService.getAllEmployees();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Employee> getEmployeeById(@PathVariable Long id) {
+        return employeeRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
