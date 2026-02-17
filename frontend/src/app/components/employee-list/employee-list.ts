@@ -21,6 +21,8 @@ import { Router } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EmployeeListComponent implements OnInit {
+  // Mod de vizualizare (default pe grid)
+  viewMode = signal<'grid' | 'table'>('grid');
   private router = inject(Router);
   private employeeService = inject(EmployeeService);
 

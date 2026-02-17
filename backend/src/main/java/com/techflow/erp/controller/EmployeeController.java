@@ -31,7 +31,6 @@ public class EmployeeController {
     @PostMapping
     public ResponseEntity<Employee> addEmployee(@RequestBody Employee employee) {
         Employee newEmployee = employeeService.addEmployee(employee);
-        // Returnăm status 201 Created și obiectul salvat
         return new ResponseEntity<>(newEmployee, HttpStatus.CREATED);
     }
 
