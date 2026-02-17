@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @layer base {
   body {
@@ -15,7 +15,7 @@
     margin: 0;
   }
 
-  input[type=number] {
+  input[type='number'] {
     -moz-appearance: textfield;
     appearance: textfield;
   }
@@ -25,12 +25,14 @@
   /* --- BENTO CARDS --- */
   .bento-card {
     display: block;
-    background-color: rgba(15, 23, 42, 0.6); 
+    background-color: rgba(15, 23, 42, 0.6);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 1.5rem;
-    padding: 2rem; 
+    padding: 2rem;
     /* Am scos tranzitiile complexe ca sa fie mai stabil */
-    transition: transform 0.2s ease, border-color 0.2s ease;
+    transition:
+      transform 0.2s ease,
+      border-color 0.2s ease;
     margin-bottom: 1rem;
   }
 
@@ -40,7 +42,7 @@
   }
 
   /* --- FORMULAR STATIC & HIGHLIGHT --- */
-  
+
   .tf-label {
     display: block;
     font-size: 10px;
@@ -51,30 +53,125 @@
     margin-bottom: 0.5rem;
   }
 
+  /* --- BUTTONS (Indigo/Slate Theme) --- */
+  .tf-btn-primary {
+    background: #6366f1;
+    color: white;
+    font-weight: 600;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+  }
+
+  .tf-btn-primary:hover:not(:disabled) {
+    background: #4f46e5;
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+  }
+
+  .tf-btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #334155;
+  }
+
+  .tf-btn-secondary {
+    background: rgba(51, 65, 85, 0.5);
+    color: #f8fafc;
+    font-weight: 600;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .tf-btn-secondary:hover {
+    background: rgba(51, 65, 85, 0.8);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  /* --- ACTION BUTTONS (Edit/Delete pe Card) --- */
+  .card-action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(15, 23, 42, 0.8);
+    color: #94a3b8;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .card-action-btn.edit:hover {
+    color: #6366f1;
+    border-color: #6366f1;
+    background: rgba(99, 102, 241, 0.1);
+  }
+
+  .card-action-btn.delete:hover {
+    color: #ef4444;
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+  }
+
+  /* Modifică în styles.css sub @layer components */
+
   .tf-input {
     width: 100%;
-    background-color: #1e293b !important; /* Fundal solid, nu mai e transparent, pentru stabilitate vizuala */
+    background-color: #1e293b !important;
     border: 1px solid #334155 !important;
     border-radius: 0.75rem;
     padding: 0.75rem 1rem;
     color: white;
     font-size: 0.9375rem;
-    /* Eliminam orice tranzitie de miscare, lasam doar culorile */
-    transition: border-color 0.1s ease, box-shadow 0.1s ease;
+    /* Reducem tranzitia la aproape zero pentru reactie instantanee */
+    transition: border-color 0.05s ease-out !important;
     outline: none !important;
     display: block;
   }
 
-  /* HIGHLIGHT-UL PUTERNIC (Quantum Focus) */
   .tf-input:focus {
-    border-color: #6366f1 !important; /* Indigo clar */
+    border-color: #6366f1 !important;
     background-color: #1e293b !important;
-    /* Un "glow" mai dens si mai putin difuz pentru a parea static si solid */
-    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.4) !important;
+    /* Scoatem box-shadow-ul complex daca e lag, sau il facem foarte simplu */
+    box-shadow: 0 0 0 1px #6366f1 !important;
+  }
+
+  /* IMPORTANT: Scoate blur-ul de pe fundalul modalului daca lag-ul persista */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(
+      2,
+      6,
+      23,
+      0.95
+    ); /* Facem fundalul aproape opac ca sa nu mai calculam transparenta */
+    backdrop-filter: none !important; /* ELIMINĂ BLUR-UL - asta e cauza nr. 1 de lag la tastare */
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* --- BADGES --- */
+  .dept-badge {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
   }
 
   /* ELIMINARE ANIMAȚII MODAL (Forțăm formularul să apară instant) */
-  .modal-container, .modal-box {
+  .modal-container,
+  .modal-box {
     animation: none !important;
     transform: none !important;
     transition: none !important;

@@ -31,6 +31,11 @@ export const routes: Routes = [
             (m) => m.EmployeeDetailComponent,
           ),
       },
+      {
+        path: 'departments',
+        loadComponent: () =>
+          import('./components/department-list/department-list').then((m) => m.DepartmentList),
+      },
       { path: 'projects', component: Projects },
       { path: 'leaves', component: Leaves },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
