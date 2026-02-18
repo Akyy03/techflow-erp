@@ -96,6 +96,24 @@
         <path d="M3 6h18M3 12h18M3 18h18" stroke-linecap="round"></path>
       </svg>
     </button>
+    <div style="display: flex; gap: 10px; align-items: center">
+      <button
+        (click)="showDeleted.set(!showDeleted())"
+        [style.background]="showDeleted() ? '#ef4444' : 'rgba(99, 102, 241, 0.1)'"
+        style="
+          border: none;
+          padding: 8px 15px;
+          border-radius: 8px;
+          color: white;
+          cursor: pointer;
+          font-weight: 700;
+          font-size: 0.7rem;
+          transition: 0.3s;
+        "
+      >
+        {{ showDeleted() ? '← VIEW ACTIVE' : '📁 VIEW ARCHIVE' }}
+      </button>
+    </div>
   </div>
 </div>
 
@@ -196,50 +214,78 @@
       @for (emp of filteredEmployees(); track emp.id) {
         <div
           class="bento-card"
+          [style.opacity]="emp.isDeleted ? '0.6' : '1'"
+          [style.filter]="emp.isDeleted ? 'grayscale(1)' : 'none'"
           style="position: relative; cursor: pointer; overflow: hidden; transition: 0.3s"
           onmouseover="this.style.transform = 'translateY(-5px)'"
           onmouseout="this.style.transform = 'translateY(0)'"
         >
-          <div
-            style="position: absolute; top: 15px; right: 15px; display: flex; gap: 8px; z-index: 10"
-          >
-            <button
-              class="card-action-btn edit"
-              (click)="$event.stopPropagation(); openEditModal(emp)"
-              title="Edit Employee"
+          @if (emp.isDeleted) {
+            <div
+              style="
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                background: #ef4444;
+                color: white;
+                padding: 2px 8px;
+                border-radius: 4px;
+                font-size: 0.6rem;
+                font-weight: 900;
+                z-index: 20;
+              "
             >
-              <svg
-                width="16"
-                height="16"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z"
-                ></path>
-              </svg>
-            </button>
-            <button
-              class="card-action-btn delete"
-              (click)="$event.stopPropagation(); deleteEmployee(emp.id!)"
-              title="Delete Employee"
+              ARCHIVED
+            </div>
+          }
+
+          @if (!emp.isDeleted) {
+            <div
+              style="
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                display: flex;
+                gap: 8px;
+                z-index: 10;
+              "
             >
-              <svg
-                width="16"
-                height="16"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                viewBox="0 0 24 24"
+              <button
+                class="card-action-btn edit"
+                (click)="$event.stopPropagation(); openEditModal(emp)"
               >
-                <path
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                ></path>
-              </svg>
-            </button>
-          </div>
+                <svg
+                  width="16"
+                  height="16"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z"
+                  ></path>
+                </svg>
+              </button>
+              <button
+                class="card-action-btn delete"
+                (click)="$event.stopPropagation(); deleteEmployee(emp.id!)"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  ></path>
+                </svg>
+              </button>
+            </div>
+          }
 
           <div
             (click)="viewEmployeeProfile(emp.id!)"
@@ -269,7 +315,6 @@
               </div>
               <div
                 [style.background]="emp.role === 'MANAGER' ? '#6366f1' : '#1e293b'"
-                [style.color]="emp.role === 'MANAGER' ? 'white' : '#64748b'"
                 style="
                   position: absolute;
                   bottom: -4px;
@@ -344,9 +389,9 @@
             >
               {{ emp.salary | currency: 'EUR' }}
             </span>
-            <span style="color: #334155; font-size: 0.6rem; font-weight: 700; letter-spacing: 1px"
-              >REF: #0{{ emp.id }}</span
-            >
+            <span style="color: #334155; font-size: 0.6rem; font-weight: 700; letter-spacing: 1px">
+              REF: #0{{ emp.id }}
+            </span>
           </div>
         </div>
       } @empty {
@@ -427,7 +472,13 @@
           @for (emp of filteredEmployees(); track emp.id) {
             <tr
               (click)="viewEmployeeProfile(emp.id!)"
-              style="cursor: pointer; border-bottom: 1px solid rgba(255, 255, 255, 0.02)"
+              [style.opacity]="emp.isDeleted ? '0.6' : '1'"
+              [style.filter]="emp.isDeleted ? 'grayscale(1)' : 'none'"
+              style="
+                cursor: pointer;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+                transition: 0.3s;
+              "
             >
               <td>
                 <div
@@ -488,15 +539,28 @@
                 {{ emp.salary | currency: 'EUR' }}
               </td>
               <td style="text-align: right; padding-right: 20px">
-                <button (click)="$event.stopPropagation(); openEditModal(emp)" class="action-btn">
-                  Edit
-                </button>
-                <button
-                  (click)="$event.stopPropagation(); deleteEmployee(emp.id!)"
-                  class="action-btn delete"
-                >
-                  Delete
-                </button>
+                @if (!emp.isDeleted) {
+                  <button (click)="$event.stopPropagation(); openEditModal(emp)" class="action-btn">
+                    Edit
+                  </button>
+                  <button
+                    (click)="$event.stopPropagation(); deleteEmployee(emp.id!)"
+                    class="action-btn delete"
+                  >
+                    Delete
+                  </button>
+                } @else {
+                  <span
+                    style="
+                      color: #475569;
+                      font-size: 0.7rem;
+                      font-style: italic;
+                      padding-right: 10px;
+                    "
+                  >
+                    No actions available
+                  </span>
+                }
               </td>
             </tr>
           } @empty {

@@ -21,26 +21,23 @@ import { Router } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EmployeeListComponent implements OnInit {
-  // Mod de vizualizare (default pe grid)
   viewMode = signal<'grid' | 'table'>('grid');
   private router = inject(Router);
   private employeeService = inject(EmployeeService);
 
-  // --- STATE MANAGEMENT (Signals) ---
+  // --- STATE MANAGEMENT ---
   employees = signal<Employee[]>([]);
-  departments = signal<Department[]>([]); // Semnal nou pentru departamente
+  departments = signal<Department[]>([]);
   isModalOpen = signal(false);
   errorMessage = signal<string | null>(null);
   userRole = signal<string | null>(null);
 
-  // State pentru Editare
   isEditMode = signal(false);
   editingEmployeeId = signal<number | null>(null);
 
-  // Search & Session
   searchQuery = signal('');
+  showDeleted = signal(false);
 
-  // Obiectul pentru formular - am adăugat structura de department
   newEmployee: any = {
     firstName: '',
     lastName: '',
@@ -49,11 +46,11 @@ export class EmployeeListComponent implements OnInit {
     email: '',
     phone: '',
     hireDate: new Date().toISOString().split('T')[0],
-    department: { id: undefined, name: '' }, // Inițializat pentru ngModel
+    department: { id: undefined, name: '' },
   };
 
-  // --- CALCULATED DATA (Signals) ---
-  totalEmployees = computed(() => this.employees().length);
+  // --- CALCULATED DATA ---
+  totalEmployees = computed(() => this.employees().filter((e) => !e.isDeleted).length);
   totalBudget = computed(() => this.employees().reduce((acc, emp) => acc + (emp.salary || 0), 0));
   avgSalary = computed(() =>
     this.totalEmployees() > 0 ? this.totalBudget() / this.totalEmployees() : 0,
@@ -61,21 +58,36 @@ export class EmployeeListComponent implements OnInit {
 
   filteredEmployees = computed(() => {
     const query = this.searchQuery().toLowerCase().trim();
-    if (!query) return this.employees();
+    const allEmployees = this.employees();
+    const displayArchive = this.showDeleted();
 
-    return this.employees().filter(
-      (emp) =>
-        emp.firstName?.toLowerCase().includes(query) ||
-        emp.lastName?.toLowerCase().includes(query) ||
-        emp.position?.toLowerCase().includes(query) ||
-        emp.email?.toLowerCase().includes(query) ||
-        emp.departmentName?.toLowerCase().includes(query), // Căutare și după departament
-    );
+    return allEmployees.filter((emp: any) => {
+      // 1. Normalizăm statusul de ștergere (unele DB-uri trimit null/0/1)
+      const isArchived = !!(emp.isDeleted || emp.deleted || emp.is_deleted);
+
+      // 2. LOGICA DE AUR:
+      // Dacă suntem pe tab-ul Archive (displayArchive = true),
+      // arătăm DOAR pe cei care au isArchived = true.
+      if (displayArchive !== isArchived) return false;
+
+      // 3. Căutarea (rămâne la fel, dar aplicată pe setul deja filtrat)
+      if (query) {
+        return (
+          emp.firstName?.toLowerCase().includes(query) ||
+          emp.lastName?.toLowerCase().includes(query) ||
+          emp.position?.toLowerCase().includes(query) ||
+          emp.email?.toLowerCase().includes(query) ||
+          (emp.departmentName && emp.departmentName.toLowerCase().includes(query))
+        );
+      }
+
+      return true;
+    });
   });
 
   ngOnInit(): void {
     this.loadEmployees();
-    this.loadDepartments(); // Încărcăm departamentele la start
+    this.loadDepartments();
     this.userRole.set(localStorage.getItem('role'));
   }
 
@@ -89,7 +101,11 @@ export class EmployeeListComponent implements OnInit {
     this.employeeService.getEmployees().subscribe({
       next: (data: any) => {
         const employeesArray = Array.isArray(data) ? data : data.content || [];
-        this.employees.set(employeesArray);
+        const normalized = employeesArray.map((emp: any) => ({
+          ...emp,
+          isDeleted: !!(emp.isDeleted || emp.deleted || emp.is_deleted),
+        }));
+        this.employees.set(normalized);
       },
       error: (err) => console.error('API Error:', err),
     });
@@ -107,20 +123,16 @@ export class EmployeeListComponent implements OnInit {
     this.isEditMode.set(false);
     this.editingEmployeeId.set(null);
     this.resetForm();
-    this.loadDepartments(); // Refresh la listă când deschidem modalul
+    this.loadDepartments();
     this.isModalOpen.set(true);
   }
 
   openEditModal(employee: any) {
-    // Folosim any aici ca să forțăm trecerea peste erori
     this.isEditMode.set(true);
     this.editingEmployeeId.set(employee.id || null);
     this.loadDepartments();
 
-    // Luăm numele departamentului (care acum e un string simplu din DTO)
     const deptName = employee.departmentName;
-
-    // Căutăm obiectul corespunzător în lista de departamente pentru dropdown
     const foundDept = this.departments().find((d: any) => d.name === deptName);
 
     this.newEmployee = {
@@ -167,19 +179,14 @@ export class EmployeeListComponent implements OnInit {
     const employeeData: Employee = {
       ...this.newEmployee,
       id: this.editingEmployeeId() || undefined,
+      // Păstrăm starea de arhivare dacă edităm, altfel e false (nou)
+      isDeleted: this.isEditMode() ? !!this.newEmployee.isDeleted : false,
     };
 
     if (this.isEditMode() && this.editingEmployeeId()) {
       this.employeeService.updateEmployee(this.editingEmployeeId()!, employeeData).subscribe({
         next: (updatedEmployee) => {
-          // Păstrăm logica ta de update manual în listă
-          this.employees.update((prev) =>
-            prev.map((emp) => (emp.id === updatedEmployee.id ? updatedEmployee : emp)),
-          );
-
-          // departmentName-ul nou din DTO este mapat corect pe card
-          this.loadEmployees();
-
+          this.loadEmployees(); // Refresh complet pentru a lua DTO-ul corect de la server
           this.closeModal();
         },
         error: (err) => this.handleBackendError(err),
@@ -187,11 +194,7 @@ export class EmployeeListComponent implements OnInit {
     } else {
       this.employeeService.addEmployee(employeeData).subscribe({
         next: (addedEmployee) => {
-          this.employees.update((prev) => [...prev, addedEmployee]);
-
-          // La fel și la adăugare, pentru a popula departamentul pe cardul nou
           this.loadEmployees();
-
           this.closeModal();
         },
         error: (err) => this.handleBackendError(err),
@@ -200,12 +203,17 @@ export class EmployeeListComponent implements OnInit {
   }
 
   deleteEmployee(id: number) {
-    if (confirm('Are you sure that you want to remove this employee from the organization?')) {
+    const msg = 'Are you sure you want to archive this employee? Access will be revoked.';
+    if (confirm(msg)) {
       this.employeeService.deleteEmployee(id).subscribe({
         next: () => {
-          this.employees.update((prev) => prev.filter((e) => e.id !== id));
+          // Modificăm starea locală a semnalului
+          // filteredEmployees() va reacționa imediat și va scoate omul din listă
+          this.employees.update((prev) =>
+            prev.map((e) => (e.id === id ? { ...e, isDeleted: true } : e)),
+          );
         },
-        error: (err) => console.error('Error deleting employee:', err),
+        error: (err) => console.error('Error archiving employee:', err),
       });
     }
   }

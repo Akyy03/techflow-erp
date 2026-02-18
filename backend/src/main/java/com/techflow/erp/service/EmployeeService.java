@@ -30,11 +30,18 @@ public class EmployeeService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public void deleteEmployee(Long id) {
-        if (!employeeRepository.existsById(id)) {
-            throw new RuntimeException("Angajatul cu ID-ul " + id + " nu a fost găsit.");
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Angajatul cu ID-ul " + id + " nu a fost găsit."));
+
+        employee.setDeleted(true);
+
+        if (employee.getUser() != null) {
+            employee.getUser().setActive(false);
         }
-        employeeRepository.deleteById(id);
+
+        employeeRepository.save(employee);
     }
 
     public EmployeeResponse getEmployeeById(Long id) {
@@ -144,9 +151,10 @@ public class EmployeeService {
                 emp.getSalary(),
                 emp.getPhone(),
                 emp.getDepartment() != null ? emp.getDepartment().getName() : "No Department",
-                emp.getHireDate() != null ? emp.getHireDate().toString() : null, // Conversie LocalDate -> String
+                emp.getHireDate() != null ? emp.getHireDate().toString() : null,
                 currentRole,
-                tempPass
+                tempPass,
+                emp.isDeleted()
         );
     }
 }

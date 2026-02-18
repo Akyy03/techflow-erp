@@ -21,6 +21,8 @@ export interface Employee {
   departmentName?: string;
   department?: Department;
   temporaryPassword?: string;
+  isDeleted?: boolean;
+  isActive?: boolean;
 }
 
 @Injectable({

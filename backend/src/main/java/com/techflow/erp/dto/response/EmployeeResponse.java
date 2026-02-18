@@ -19,4 +19,5 @@ public class EmployeeResponse {
     private String hireDate;
     private String role;
     private String temporaryPassword;
+    private boolean isDeleted;
 }
