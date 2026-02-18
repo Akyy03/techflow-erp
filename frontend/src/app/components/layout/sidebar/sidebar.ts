@@ -12,7 +12,7 @@ import { AuthService } from '../../../services/auth';
 })
 export class Sidebar {
   private router = inject(Router);
-  private authService = inject(AuthService);
+  public authService = inject(AuthService);
 
   showLogoutConfirm = signal(false);
 

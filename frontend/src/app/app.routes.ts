@@ -6,6 +6,7 @@ import { SetupPassword } from './auth/setup-password/setup-password';
 
 import { authGuard } from './services/auth.guard';
 import { guestGuard } from './services/guest.guard';
+import { roleGuard } from './services/role.guard';
 
 import { Dashboard } from './components/dashboard/dashboard';
 import { Projects } from './components/projects/projects';
@@ -27,10 +28,20 @@ export const routes: Routes = [
     component: AdminShell,
     canActivate: [authGuard],
     children: [
-      { path: 'dashboard', component: Dashboard },
-      { path: 'employees', component: EmployeeListComponent },
+      {
+        path: 'dashboard',
+        component: Dashboard,
+      },
+      {
+        path: 'employees',
+        component: EmployeeListComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN', 'MANAGER'] },
+      },
       {
         path: 'employees/:id',
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN', 'MANAGER'] },
         loadComponent: () =>
           import('./features/employees/employee-detail/employee-detail').then(
             (m) => m.EmployeeDetailComponent,
@@ -38,11 +49,19 @@ export const routes: Routes = [
       },
       {
         path: 'departments',
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN'] },
         loadComponent: () =>
           import('./components/department-list/department-list').then((m) => m.DepartmentList),
       },
-      { path: 'projects', component: Projects },
-      { path: 'leaves', component: Leaves },
+      {
+        path: 'projects',
+        component: Projects,
+      },
+      {
+        path: 'leaves',
+        component: Leaves,
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },

@@ -1,12 +1,15 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router'; // <--- Importă asta
-import { Sidebar } from '../sidebar/sidebar'; // Importă și Sidebar-ul ca să-l poți folosi în HTML
+import { Component, inject } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { Sidebar } from '../sidebar/sidebar';
+import { AuthService } from '../../../services/auth';
 
 @Component({
   selector: 'app-admin-shell',
   standalone: true,
-  imports: [RouterOutlet, Sidebar], // <--- Adaugă-le aici
+  imports: [RouterOutlet, Sidebar], 
   templateUrl: './admin-shell.html',
   styleUrl: './admin-shell.css'
 })
-export class AdminShell {}
+export class AdminShell {
+  public authService = inject(AuthService);
+}
