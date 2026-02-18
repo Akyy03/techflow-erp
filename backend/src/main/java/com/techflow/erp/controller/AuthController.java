@@ -26,7 +26,7 @@ public class AuthController {
                 .map(user -> {
                     if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
                         String token = jwtService.generateToken(user.getEmail(), user.getRole().name());
-                        return ResponseEntity.ok(new AuthResponse(token, user.getEmail(), user.getRole().name()));
+                        return ResponseEntity.ok(new AuthResponse(token, user.getEmail(), user.getRole().name(), user.isNeedsPasswordChange(), user.getId()));
                     }
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
                 })

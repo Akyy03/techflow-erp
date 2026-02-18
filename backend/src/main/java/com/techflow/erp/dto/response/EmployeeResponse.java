@@ -18,4 +18,5 @@ public class EmployeeResponse {
     private String departmentName;
     private String hireDate;
     private String role;
+    private String temporaryPassword;
 }

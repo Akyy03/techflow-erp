@@ -46,8 +46,6 @@ public class Employee {
     @Column(name = "is_deleted")
     private boolean isDeleted = false;
 
-    private String profilePictureUrl;
-
     // Setăm automat data angajării la data curentă dacă nu este specificată
     @PrePersist
     protected void onCreate() {

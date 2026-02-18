@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../../services/auth'; // <--- Importă serviciul
+import { AuthService } from '../../../services/auth';
 
 @Component({
   selector: 'app-sidebar',
@@ -12,7 +12,7 @@ import { AuthService } from '../../../services/auth'; // <--- Importă serviciul
 })
 export class Sidebar {
   private router = inject(Router);
-  private authService = inject(AuthService); // <--- Injectează AuthService
+  private authService = inject(AuthService);
 
   showLogoutConfirm = signal(false);
 
@@ -24,9 +24,6 @@ export class Sidebar {
         this.showLogoutConfirm.set(false);
       }, 3000);
     } else {
-      // EXECUȚIA CORECTĂ:
-      // Apelăm metoda de logout din serviciu care face clear() la tot
-      // și te redirecționează corect.
       this.authService.logout();
     }
   }

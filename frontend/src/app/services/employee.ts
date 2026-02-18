@@ -20,6 +20,7 @@ export interface Employee {
   role?: 'EMPLOYEE' | 'MANAGER';
   departmentName?: string;
   department?: Department;
+  temporaryPassword?: string;
 }
 
 @Injectable({

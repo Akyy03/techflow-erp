@@ -44,17 +44,16 @@ public class EmployeeService {
     }
 
     @Transactional
-    public Employee addEmployee(Employee employee) {
+    public EmployeeResponse addEmployee(Employee employee) {
         validateEmailDomain(employee.getEmail());
 
         if (employee.getUser() == null) {
             User newUser = createAutomaticUser(employee.getEmail());
             employee.setUser(newUser);
-        } else {
-            employee.getUser().setEmail(employee.getEmail());
         }
 
-        return employeeRepository.save(employee);
+        Employee saved = employeeRepository.save(employee);
+        return mapToResponse(saved);
     }
 
     @Transactional
@@ -107,12 +106,19 @@ public class EmployeeService {
         }
     }
 
-    private User createAutomaticUser(String email) {
+    private User createAutomaticUser(String email) { // Am scos outPassword ca nu mai avem nevoie de artificiul ala
         User user = new User();
         user.setEmail(email);
-        user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+
+        String tempPass = UUID.randomUUID().toString().substring(0, 10);
+
+        user.setPassword(passwordEncoder.encode(tempPass));
+        user.setTempPasswordPlain(tempPass); // <--- O salvăm în noua coloană
+
         user.setRole(Role.EMPLOYEE);
         user.setActive(true);
+        user.setNeedsPasswordChange(true);
+
         return user;
     }
 
@@ -121,10 +127,13 @@ public class EmployeeService {
                 .map(User::getEmail)
                 .orElse(emp.getEmail() != null ? emp.getEmail() : "no-email" + ALLOWED_DOMAIN);
 
-        // Extragem rolul din obiectul User asociat
         String currentRole = Optional.ofNullable(emp.getUser())
                 .map(u -> u.getRole().name())
                 .orElse("EMPLOYEE");
+
+        String tempPass = Optional.ofNullable(emp.getUser())
+                .map(User::getTempPasswordPlain)
+                .orElse(null);
 
         return new EmployeeResponse(
                 emp.getId(),
@@ -136,7 +145,8 @@ public class EmployeeService {
                 emp.getPhone(),
                 emp.getDepartment() != null ? emp.getDepartment().getName() : "No Department",
                 emp.getHireDate() != null ? emp.getHireDate().toString() : null, // Conversie LocalDate -> String
-                currentRole
+                currentRole,
+                tempPass
         );
     }
 }

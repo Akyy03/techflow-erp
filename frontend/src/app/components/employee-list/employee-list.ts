@@ -91,14 +91,14 @@ export class EmployeeListComponent implements OnInit {
         const employeesArray = Array.isArray(data) ? data : data.content || [];
         this.employees.set(employeesArray);
       },
-      error: (err) => console.error('Eroare API:', err),
+      error: (err) => console.error('API Error:', err),
     });
   }
 
   loadDepartments() {
     this.employeeService.getDepartments().subscribe({
       next: (data) => this.departments.set(data),
-      error: (err) => console.error('Eroare încărcare departamente:', err),
+      error: (err) => console.error('Error loading departments:', err),
     });
   }
 
@@ -200,12 +200,12 @@ export class EmployeeListComponent implements OnInit {
   }
 
   deleteEmployee(id: number) {
-    if (confirm('Ești sigur că vrei să elimini acest talent din echipă?')) {
+    if (confirm('Are you sure that you want to remove this employee from the organization?')) {
       this.employeeService.deleteEmployee(id).subscribe({
         next: () => {
           this.employees.update((prev) => prev.filter((e) => e.id !== id));
         },
-        error: (err) => console.error('Eroare la ștergere:', err),
+        error: (err) => console.error('Error deleting employee:', err),
       });
     }
   }

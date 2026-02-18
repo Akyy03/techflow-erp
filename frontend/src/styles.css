@@ -5,7 +5,7 @@
     background-color: #030712;
     color: white;
     margin: 0;
-    font-family: 'Inter', sans-serif; /* Am trecut la Inter pentru un look mai modern */
+    font-family: 'Inter', sans-serif;
   }
 
   /* --- ELIMINARE SCROLLBAR / SPIN-BUTTONS SALARIU --- */
@@ -29,7 +29,6 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 1.5rem;
     padding: 2rem;
-    /* Am scos tranzitiile complexe ca sa fie mai stabil */
     transition:
       transform 0.2s ease,
       border-color 0.2s ease;
@@ -38,7 +37,7 @@
 
   .bento-card:hover {
     border-color: rgba(99, 102, 241, 0.5);
-    transform: translateY(-2px); /* Ridicare aproape insesizabila */
+    transform: translateY(-2px);
   }
 
   /* --- FORMULAR STATIC & HIGHLIGHT --- */
@@ -119,8 +118,6 @@
     background: rgba(239, 68, 68, 0.1);
   }
 
-  /* Modifică în styles.css sub @layer components */
-
   .tf-input {
     width: 100%;
     background-color: #1e293b !important;
@@ -129,7 +126,6 @@
     padding: 0.75rem 1rem;
     color: white;
     font-size: 0.9375rem;
-    /* Reducem tranzitia la aproape zero pentru reactie instantanee */
     transition: border-color 0.05s ease-out !important;
     outline: none !important;
     display: block;
@@ -138,21 +134,14 @@
   .tf-input:focus {
     border-color: #6366f1 !important;
     background-color: #1e293b !important;
-    /* Scoatem box-shadow-ul complex daca e lag, sau il facem foarte simplu */
     box-shadow: 0 0 0 1px #6366f1 !important;
   }
 
-  /* IMPORTANT: Scoate blur-ul de pe fundalul modalului daca lag-ul persista */
   .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(
-      2,
-      6,
-      23,
-      0.95
-    ); /* Facem fundalul aproape opac ca sa nu mai calculam transparenta */
-    backdrop-filter: none !important; /* ELIMINĂ BLUR-UL - asta e cauza nr. 1 de lag la tastare */
+    background: rgba(2, 6, 23, 0.95);
+    backdrop-filter: none !important;
     z-index: 1000;
     display: flex;
     align-items: center;

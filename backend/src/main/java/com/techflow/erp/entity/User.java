@@ -27,6 +27,12 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(name = "needs_password_change", nullable = false)
+    private boolean needsPasswordChange = true;
+
+    @Column(name = "temp_password_plain")
+    private String tempPasswordPlain;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;

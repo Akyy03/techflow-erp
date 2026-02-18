@@ -61,7 +61,7 @@ export class EmployeeDetailComponent implements OnInit {
         : `Revoke management privileges for ${fullName}?`;
 
     if (confirm(msg)) {
-      // Clonăm obiectul cu atenție
+      // Clonăm obiectul
       const updatedEmployee: Employee = {
         ...currentEmp,
         role: newRole,
@@ -73,7 +73,6 @@ export class EmployeeDetailComponent implements OnInit {
         next: (res) => {
           // Forțăm refresh-ul datelor din răspunsul serverului
           this.employee.set(res);
-          // Dacă seniority tot dispare, înseamnă că 'res' vine de la server fără hireDate
           console.log('Update successful, server returned:', res);
         },
         error: (err) => {
@@ -82,5 +81,17 @@ export class EmployeeDetailComponent implements OnInit {
         },
       });
     }
+  }
+
+  showPassword = signal(false);
+
+  togglePassword() {
+    this.showPassword.update((v) => !v);
+  }
+
+  copyToClipboard(text: string | undefined) {
+    if (text) {
+      navigator.clipboard.writeText(text);
+      alert('Copied!');}
   }
 }

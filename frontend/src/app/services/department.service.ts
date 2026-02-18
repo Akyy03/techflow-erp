@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Department } from './employee'; // Importăm interfața din locul original pentru moment
+import { Department } from './employee';
 
 @Injectable({
   providedIn: 'root',

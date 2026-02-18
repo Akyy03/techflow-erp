@@ -17,6 +17,8 @@ export class AuthService {
         localStorage.setItem('token', response.token);
         localStorage.setItem('role', response.role);
         localStorage.setItem('email', response.email);
+        localStorage.setItem('userId', String(response.userId));
+        localStorage.setItem('needsPasswordChange', String(response.needsPasswordChange));
       }),
     );
   }
