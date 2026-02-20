@@ -157,4 +157,18 @@ public class EmployeeService {
                 emp.isDeleted()
         );
     }
+
+    @Transactional
+    public Employee restoreEmployee(Long id) {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+
+        employee.setDeleted(false);
+
+        if (employee.getUser() != null) {
+            employee.getUser().setActive(true);
+        }
+
+        return employeeRepository.save(employee);
+    }
 }

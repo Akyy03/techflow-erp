@@ -51,7 +51,13 @@ export class EmployeeListComponent implements OnInit {
 
   // --- CALCULATED DATA ---
   totalEmployees = computed(() => this.employees().filter((e) => !e.isDeleted).length);
-  totalBudget = computed(() => this.employees().reduce((acc, emp) => acc + (emp.salary || 0), 0));
+
+  totalBudget = computed(() =>
+    this.employees()
+      .filter((e) => !e.isDeleted) // Ignorăm arhivatii
+      .reduce((acc, emp) => acc + (emp.salary || 0), 0),
+  );
+
   avgSalary = computed(() =>
     this.totalEmployees() > 0 ? this.totalBudget() / this.totalEmployees() : 0,
   );
@@ -65,12 +71,10 @@ export class EmployeeListComponent implements OnInit {
       // 1. Normalizăm statusul de ștergere (unele DB-uri trimit null/0/1)
       const isArchived = !!(emp.isDeleted || emp.deleted || emp.is_deleted);
 
-      // 2. LOGICA DE AUR:
       // Dacă suntem pe tab-ul Archive (displayArchive = true),
       // arătăm DOAR pe cei care au isArchived = true.
       if (displayArchive !== isArchived) return false;
 
-      // 3. Căutarea (rămâne la fel, dar aplicată pe setul deja filtrat)
       if (query) {
         return (
           emp.firstName?.toLowerCase().includes(query) ||
@@ -214,6 +218,23 @@ export class EmployeeListComponent implements OnInit {
           );
         },
         error: (err) => console.error('Error archiving employee:', err),
+      });
+    }
+  }
+
+  restoreEmployee(id: number) {
+    if (confirm('Reactivate this employee and their user account?')) {
+      this.employeeService.restoreEmployee(id).subscribe({
+        next: (updatedEmp) => {
+          this.loadEmployees();
+
+          this.showDeleted.set(false);
+
+          console.log('Employee restored and list refreshed.');
+        },
+        error: (err) => {
+          console.error('Restore failed:', err);
+        },
       });
     }
   }

@@ -46,4 +46,9 @@ public class EmployeeController {
         EmployeeResponse updatedEmployee = employeeService.updateEmployee(id, employeeDetails);
         return ResponseEntity.ok(updatedEmployee);
     }
+
+    @PutMapping("/{id}/restore")
+    public ResponseEntity<Employee> restoreEmployee(@PathVariable Long id) {
+        return ResponseEntity.ok(employeeService.restoreEmployee(id));
+    }
 }

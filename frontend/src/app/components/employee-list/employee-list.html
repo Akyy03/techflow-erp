@@ -237,6 +237,14 @@
             >
               ARCHIVED
             </div>
+            <div style="position: absolute; top: 10px; right: 10px; z-index: 30">
+              <button
+                (click)="$event.stopPropagation(); restoreEmployee(emp.id!)"
+                class="restore-btn"
+              >
+                RESTORE
+              </button>
+            </div>
           }
 
           @if (!emp.isDeleted) {
@@ -425,9 +433,7 @@
               Clear Search
             </button>
           } @else {
-            <p style="color: #64748b; font-size: 1rem; margin: 0">
-              The talent pool is currently empty.
-            </p>
+            <p style="color: #64748b; font-size: 1rem; margin: 0">No employees available.</p>
             <button
               (click)="openAddModal()"
               style="
@@ -550,16 +556,12 @@
                     Delete
                   </button>
                 } @else {
-                  <span
-                    style="
-                      color: #475569;
-                      font-size: 0.7rem;
-                      font-style: italic;
-                      padding-right: 10px;
-                    "
+                  <button
+                    (click)="$event.stopPropagation(); restoreEmployee(emp.id!)"
+                    class="restore-btn"
                   >
-                    No actions available
-                  </span>
+                    RESTORE
+                  </button>
                 }
               </td>
             </tr>

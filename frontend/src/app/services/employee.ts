@@ -56,4 +56,8 @@ export class EmployeeService {
   getEmployeeById(id: number): Observable<Employee> {
     return this.http.get<Employee>(`${this.apiUrl}/${id}`);
   }
+
+  restoreEmployee(id: number): Observable<Employee> {
+    return this.http.put<Employee>(`${this.apiUrl}/${id}/restore`, {});
+  }
 }

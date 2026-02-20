@@ -6,31 +6,40 @@
       <span class="icon">📊</span> Dashboard
     </a>
 
-    @if (authService.isAdmin()) {
+    @if (authService.isAdmin() || authService.isManager()) {
       <a routerLink="/departments" routerLinkActive="active-link" class="nav-item">
-        <span class="icon">🏢</span> Departments
+        <span class="icon">🏢</span>
+        {{ authService.isAdmin() ? 'Departments' : 'My Department' }}
       </a>
     }
 
     @if (authService.isAdmin() || authService.isManager()) {
       <a routerLink="/employees" routerLinkActive="active-link" class="nav-item">
-        <span class="icon">👥</span> 
+        <span class="icon">👥</span>
         {{ authService.isAdmin() ? 'Staff Management' : 'My Team' }}
       </a>
     }
 
     <a routerLink="/projects" routerLinkActive="active-link" class="nav-item">
-      <span class="icon">🚀</span> 
-      @if (authService.isAdmin()) { Project Planning }
-      @else if (authService.isManager()) { Team Projects }
-      @else { My Tasks }
+      <span class="icon">🚀</span>
+      @if (authService.isAdmin()) {
+        Projects
+      } @else if (authService.isManager()) {
+        Team Projects
+      } @else {
+        My Tasks
+      }
     </a>
 
     <a routerLink="/leaves" routerLinkActive="active-link" class="nav-item">
-      <span class="icon">📅</span> 
-      @if (authService.isAdmin()) { Global Leaves }
-      @else if (authService.isManager()) { Approval Center }
-      @else { My Requests }
+      <span class="icon">📅</span>
+      @if (authService.isAdmin()) {
+        Global Leaves
+      } @else if (authService.isManager()) {
+        Approval Center
+      } @else {
+        My Requests
+      }
     </a>
 
     @if (authService.isAdmin() || authService.isManager()) {
