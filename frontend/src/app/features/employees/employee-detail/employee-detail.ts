@@ -16,13 +16,29 @@ export class EmployeeDetailComponent implements OnInit {
   private router = inject(Router);
   private empService = inject(EmployeeService);
 
+  // Folosim "role" pentru că așa este salvat în localStorage
+  userRole = signal<string | null>(null);
   employee = signal<Employee | null>(null);
+  showPassword = signal(false);
 
   ngOnInit() {
+    // 1. Corecția cheii: Citim "role" în loc de "userRole"
+    const rawRole = localStorage.getItem('role'); 
+    if (rawRole) {
+      const cleanRole = rawRole.replace(/"/g, '').trim().toUpperCase();
+      this.userRole.set(cleanRole);
+      console.log('Auth Check - Current User Role:', cleanRole);
+    } else {
+      console.warn('No role found in localStorage under key "role"');
+    }
+
+    // 2. Recuperare date angajat
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.empService.getEmployeeById(+id).subscribe({
-        next: (data) => this.employee.set(data),
+        next: (data) => {
+          this.employee.set(data);
+        },
         error: (err) => {
           console.error('Error fetching employee', err);
           this.router.navigate(['/employees']);
@@ -61,29 +77,23 @@ export class EmployeeDetailComponent implements OnInit {
         : `Revoke management privileges for ${fullName}?`;
 
     if (confirm(msg)) {
-      // Clonăm obiectul
       const updatedEmployee: Employee = {
         ...currentEmp,
         role: newRole,
       };
 
-      console.log('Sending update to server:', updatedEmployee);
-
       this.empService.updateEmployee(currentEmp.id, updatedEmployee).subscribe({
         next: (res) => {
-          // Forțăm refresh-ul datelor din răspunsul serverului
           this.employee.set(res);
-          console.log('Update successful, server returned:', res);
+          console.log('Update successful:', res);
         },
         error: (err) => {
-          console.error('Full Error Object:', err);
+          console.error('Update failed:', err);
           alert(`System failure: ${err.message || 'Check backend logs.'}`);
         },
       });
     }
   }
-
-  showPassword = signal(false);
 
   togglePassword() {
     this.showPassword.update((v) => !v);
@@ -92,6 +102,7 @@ export class EmployeeDetailComponent implements OnInit {
   copyToClipboard(text: string | undefined) {
     if (text) {
       navigator.clipboard.writeText(text);
-      alert('Copied!');}
+      alert('Copied!');
+    }
   }
 }

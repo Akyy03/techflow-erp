@@ -52,11 +52,20 @@ export class EmployeeListComponent implements OnInit {
   // --- CALCULATED DATA ---
   totalEmployees = computed(() => this.employees().filter((e) => !e.isDeleted).length);
 
-  totalBudget = computed(() =>
-    this.employees()
-      .filter((e) => !e.isDeleted) // Ignorăm arhivatii
-      .reduce((acc, emp) => acc + (emp.salary || 0), 0),
-  );
+  totalBudget = computed(() => {
+    const role = this.userRole();
+    const emps = this.filteredEmployees();
+
+    if (role === 'ADMIN') {
+      // Admin vede tot
+      return emps.reduce((acc, emp) => acc + (emp.salary || 0), 0);
+    } else {
+      // Managerul vede doar totalul celor care NU sunt manageri
+      return emps
+        .filter((emp) => emp.role !== 'MANAGER')
+        .reduce((acc, emp) => acc + (emp.salary || 0), 0);
+    }
+  });
 
   avgSalary = computed(() =>
     this.totalEmployees() > 0 ? this.totalBudget() / this.totalEmployees() : 0,
@@ -66,15 +75,22 @@ export class EmployeeListComponent implements OnInit {
     const query = this.searchQuery().toLowerCase().trim();
     const allEmployees = this.employees();
     const displayArchive = this.showDeleted();
+    const role = this.userRole();
 
     return allEmployees.filter((emp: any) => {
-      // 1. Normalizăm statusul de ștergere (unele DB-uri trimit null/0/1)
+      // 1. Normalizăm statusul de ștergere
       const isArchived = !!(emp.isDeleted || emp.deleted || emp.is_deleted);
 
-      // Dacă suntem pe tab-ul Archive (displayArchive = true),
-      // arătăm DOAR pe cei care au isArchived = true.
-      if (displayArchive !== isArchived) return false;
+      // --- LOGICĂ FILTRARE ROLURI ---
+      if (role === 'MANAGER') {
+        // Managerul nu vede niciodată arhiva în lista principală
+        if (isArchived) return false;
+      } else {
+        // Adminul vede Active sau Archive în funcție de toggle
+        if (displayArchive !== isArchived) return false;
+      }
 
+      // --- LOGICĂ SEARCH ---
       if (query) {
         return (
           emp.firstName?.toLowerCase().includes(query) ||
@@ -90,9 +106,10 @@ export class EmployeeListComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    // Întâi setăm rolul, apoi încărcăm angajații
+    this.userRole.set(localStorage.getItem('role'));
     this.loadEmployees();
     this.loadDepartments();
-    this.userRole.set(localStorage.getItem('role'));
   }
 
   // --- ACTIONS ---
@@ -105,10 +122,34 @@ export class EmployeeListComponent implements OnInit {
     this.employeeService.getEmployees().subscribe({
       next: (data: any) => {
         const employeesArray = Array.isArray(data) ? data : data.content || [];
-        const normalized = employeesArray.map((emp: any) => ({
+        const role = this.userRole();
+        const myEmail = localStorage.getItem('email'); // Folosim email-ul unic din storage
+
+        // 1. Normalizăm datele (Arhivă, etc.)
+        let normalized = employeesArray.map((emp: any) => ({
           ...emp,
           isDeleted: !!(emp.isDeleted || emp.deleted || emp.is_deleted),
         }));
+
+        // 2. Logică specifică pentru MANAGER
+        if (role === 'MANAGER' && myEmail) {
+          // Găsim profilul managerului logat folosind email-ul (care e anchor sigur)
+          const myProfile = normalized.find((e: any) => e.email === myEmail);
+
+          if (myProfile) {
+            const myDept = myProfile.departmentName;
+            console.log(`Logat ca Manager: ${myEmail} | Departament: ${myDept}`);
+
+            // Păstrăm doar angajații din același departament
+            normalized = normalized.filter((emp: any) => emp.departmentName === myDept);
+          } else {
+            // Fallback în caz că email-ul de login nu există în lista de angajați
+            console.error('Managerul nu a fost găsit în lista de angajați după email.');
+            normalized = [];
+          }
+        }
+
+        // 3. Setăm semnalul cu lista (filtrată sau nu, depinde de rol)
         this.employees.set(normalized);
       },
       error: (err) => console.error('API Error:', err),
@@ -183,21 +224,20 @@ export class EmployeeListComponent implements OnInit {
     const employeeData: Employee = {
       ...this.newEmployee,
       id: this.editingEmployeeId() || undefined,
-      // Păstrăm starea de arhivare dacă edităm, altfel e false (nou)
       isDeleted: this.isEditMode() ? !!this.newEmployee.isDeleted : false,
     };
 
     if (this.isEditMode() && this.editingEmployeeId()) {
       this.employeeService.updateEmployee(this.editingEmployeeId()!, employeeData).subscribe({
-        next: (updatedEmployee) => {
-          this.loadEmployees(); // Refresh complet pentru a lua DTO-ul corect de la server
+        next: () => {
+          this.loadEmployees();
           this.closeModal();
         },
         error: (err) => this.handleBackendError(err),
       });
     } else {
       this.employeeService.addEmployee(employeeData).subscribe({
-        next: (addedEmployee) => {
+        next: () => {
           this.loadEmployees();
           this.closeModal();
         },
@@ -211,8 +251,6 @@ export class EmployeeListComponent implements OnInit {
     if (confirm(msg)) {
       this.employeeService.deleteEmployee(id).subscribe({
         next: () => {
-          // Modificăm starea locală a semnalului
-          // filteredEmployees() va reacționa imediat și va scoate omul din listă
           this.employees.update((prev) =>
             prev.map((e) => (e.id === id ? { ...e, isDeleted: true } : e)),
           );
@@ -225,11 +263,9 @@ export class EmployeeListComponent implements OnInit {
   restoreEmployee(id: number) {
     if (confirm('Reactivate this employee and their user account?')) {
       this.employeeService.restoreEmployee(id).subscribe({
-        next: (updatedEmp) => {
+        next: () => {
           this.loadEmployees();
-
           this.showDeleted.set(false);
-
           console.log('Employee restored and list refreshed.');
         },
         error: (err) => {

@@ -80,7 +80,13 @@
       <div class="bento-card">
         <p class="tf-label">Salary & Compensation</p>
         <div class="data-value highlight-purple" style="font-size: 2rem">
-          {{ employee()?.salary | currency: 'EUR' }}
+          @if (
+            userRole() === 'ADMIN' || (userRole() === 'MANAGER' && employee()?.role === 'EMPLOYEE')
+          ) {
+            {{ employee()?.salary | currency: 'EUR' }}
+          } @else {
+            <span style="letter-spacing: 4px; opacity: 0.5">••••••</span>
+          }
         </div>
         <p style="font-size: 0.8rem; color: #475569; margin-top: 5px">Monthly Income</p>
       </div>
@@ -114,40 +120,42 @@
       </div>
     </div>
 
-    <div class="admin-control-card" style="margin-top: 30px">
-      <div class="status-info">
-        <span class="tf-label">CURRENT AUTHORITY LEVEL</span>
-        <h3 [style.color]="employee()?.role === 'MANAGER' ? '#818cf8' : '#94a3b8'">
-          {{ employee()?.role || 'NOT SET' }}
-        </h3>
-      </div>
+    @if (userRole() === 'ADMIN') {
+      <div class="admin-control-card" style="margin-top: 30px">
+        <div class="status-info">
+          <span class="tf-label">CURRENT AUTHORITY LEVEL</span>
+          <h3 [style.color]="employee()?.role === 'MANAGER' ? '#818cf8' : '#94a3b8'">
+            {{ employee()?.role || 'NOT SET' }}
+          </h3>
+        </div>
 
-      @if (employee()?.role === 'MANAGER') {
-        <button (click)="changeRole('EMPLOYEE')" class="tf-btn-demote">
-          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              d="M19 9l-7 7-7-7"
-              stroke-width="3"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-          DEMOTE TO STAFF
-        </button>
-      } @else {
-        <button (click)="changeRole('MANAGER')" class="tf-btn-promote">
-          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              d="M5 15l7-7 7 7"
-              stroke-width="3"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-          PROMOTE TO MANAGER
-        </button>
-      }
-    </div>
+        @if (employee()?.role === 'MANAGER') {
+          <button (click)="changeRole('EMPLOYEE')" class="tf-btn-demote">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M19 9l-7 7-7-7"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            DEMOTE TO STAFF
+          </button>
+        } @else {
+          <button (click)="changeRole('MANAGER')" class="tf-btn-promote">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M5 15l7-7 7 7"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            PROMOTE TO MANAGER
+          </button>
+        }
+      </div>
+    }
   } @else {
     <div class="bento-card" style="padding: 100px; text-align: center; color: #64748b">
       <div class="spinner"></div>
@@ -270,7 +278,6 @@
               </svg>
             }
           </button>
-
           <button
             (click)="copyToClipboard(employee()?.temporaryPassword)"
             style="background: none; border: none; color: #64748b; cursor: pointer; padding: 5px"

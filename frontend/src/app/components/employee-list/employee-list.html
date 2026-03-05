@@ -42,7 +42,9 @@
     <input
       type="text"
       (input)="onSearch($event)"
-      placeholder="by name, position or department..."
+      [placeholder]="
+        userRole() === 'ADMIN' ? 'by name, position or department...' : 'by name or position...'
+      "
       class="tf-input"
       style="
         padding-left: 85px !important;
@@ -96,7 +98,8 @@
         <path d="M3 6h18M3 12h18M3 18h18" stroke-linecap="round"></path>
       </svg>
     </button>
-    <div style="display: flex; gap: 10px; align-items: center">
+
+    <div *ngIf="userRole() === 'ADMIN'" style="display: flex; gap: 10px; align-items: center">
       <button
         (click)="showDeleted.set(!showDeleted())"
         [style.background]="showDeleted() ? '#ef4444' : 'rgba(99, 102, 241, 0.1)'"
@@ -125,9 +128,9 @@
       flex-direction: column;
       justify-content: center;
       min-height: 160px;
-      flex: 2.3;
       min-width: 300px;
     "
+    [style.flex]="userRole() === 'ADMIN' ? '2.3' : '1'"
   >
     <p class="tf-label">Total Budget Allocation</p>
     <h2 style="font-size: 2.5rem; margin-top: 10px; font-weight: 300; color: white">
@@ -139,6 +142,7 @@
   </div>
 
   <div
+    *ngIf="userRole() === 'ADMIN'"
     (click)="openAddModal()"
     class="bento-card"
     style="
@@ -276,6 +280,7 @@
                 </svg>
               </button>
               <button
+                *ngIf="userRole() === 'ADMIN'"
                 class="card-action-btn delete"
                 (click)="$event.stopPropagation(); deleteEmployee(emp.id!)"
               >
@@ -388,6 +393,7 @@
             "
           >
             <span
+              *ngIf="userRole() === 'ADMIN' || emp.role !== 'MANAGER'"
               style="
                 color: #818cf8;
                 font-family: 'JetBrains Mono', monospace;
@@ -396,6 +402,12 @@
               "
             >
               {{ emp.salary | currency: 'EUR' }}
+            </span>
+            <span
+              *ngIf="userRole() === 'MANAGER' && emp.role === 'MANAGER'"
+              style="color: #475569; font-size: 0.75rem; font-style: italic"
+            >
+              Confidential
             </span>
             <span style="color: #334155; font-size: 0.6rem; font-weight: 700; letter-spacing: 1px">
               REF: #0{{ emp.id }}
@@ -435,6 +447,7 @@
           } @else {
             <p style="color: #64748b; font-size: 1rem; margin: 0">No employees available.</p>
             <button
+              *ngIf="userRole() === 'ADMIN'"
               (click)="openAddModal()"
               style="
                 margin-top: 10px;
@@ -542,7 +555,14 @@
                 <span class="dept-badge">{{ emp.departmentName || 'Unassigned' }}</span>
               </td>
               <td style="padding: 12px; font-family: 'JetBrains Mono'; color: #818cf8">
-                {{ emp.salary | currency: 'EUR' }}
+                <ng-container
+                  *ngIf="userRole() === 'ADMIN' || emp.role !== 'MANAGER'; else hiddenSalary"
+                >
+                  {{ emp.salary | currency: 'EUR' }}
+                </ng-container>
+                <ng-template #hiddenSalary>
+                  <span style="color: #475569; font-size: 0.75rem">***</span>
+                </ng-template>
               </td>
               <td style="text-align: right; padding-right: 20px">
                 @if (!emp.isDeleted) {
@@ -550,6 +570,7 @@
                     Edit
                   </button>
                   <button
+                    *ngIf="userRole() === 'ADMIN'"
                     (click)="$event.stopPropagation(); deleteEmployee(emp.id!)"
                     class="action-btn delete"
                   >
@@ -557,6 +578,7 @@
                   </button>
                 } @else {
                   <button
+                    *ngIf="userRole() === 'ADMIN'"
                     (click)="$event.stopPropagation(); restoreEmployee(emp.id!)"
                     class="restore-btn"
                   >
@@ -686,16 +708,37 @@
             />
           </div>
           <div>
-            <label class="tf-label">Salary (EUR)</label>
-            <input
-              [(ngModel)]="newEmployee.salary"
-              name="salary"
-              type="number"
-              min="0"
-              required
-              class="tf-input"
-            />
-          </div>
+  <label class="tf-label">Salary (EUR)</label>
+  
+  <input
+    *ngIf="userRole() === 'ADMIN' || newEmployee.role !== 'MANAGER'"
+    [(ngModel)]="newEmployee.salary"
+    name="salary"
+    type="number"
+    min="0"
+    required
+    class="tf-input"
+    placeholder="0.00"
+  />
+
+  <div
+    *ngIf="userRole() === 'MANAGER' && newEmployee.role === 'MANAGER'"
+    class="tf-input"
+    style="
+      background: rgba(15, 23, 42, 0.6);
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: not-allowed;
+    "
+  >
+    <span style="font-family: 'JetBrains Mono', monospace; letter-spacing: 2px;">••••••</span>
+    <span style="font-size: 0.6rem; font-weight: 800; color: #475569; text-transform: uppercase;">
+      Protected
+    </span>
+  </div>
+</div>
         </div>
 
         <div>
