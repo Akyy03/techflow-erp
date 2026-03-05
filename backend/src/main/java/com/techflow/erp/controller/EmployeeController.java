@@ -4,11 +4,13 @@ import com.techflow.erp.dto.response.EmployeeResponse;
 import com.techflow.erp.entity.Employee;
 import com.techflow.erp.repository.EmployeeRepository;
 import com.techflow.erp.service.EmployeeService;
+import com.techflow.erp.service.LeaveCalculationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -18,6 +20,7 @@ public class EmployeeController {
 
     private final EmployeeService employeeService;
     private final EmployeeRepository employeeRepository;
+    private final LeaveCalculationService leaveCalculationService;
 
     @GetMapping
     public List<EmployeeResponse> getEmployees() {

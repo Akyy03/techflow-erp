@@ -1,1 +1,202 @@
-<p>leaves works!</p>
+<div class="leaves-container" style="padding: 20px; max-width: 1200px; margin: 0 auto">
+  <div style="margin-bottom: 30px">
+    <h1 style="color: white; margin: 0; font-size: 1.8rem; font-weight: 800; letter-spacing: -1px">
+      LEAVE <span style="color: #6366f1">MANAGEMENT</span>
+    </h1>
+    <p style="color: #64748b; margin-top: 5px; font-weight: 500">
+      Track and request your time-off periods
+    </p>
+  </div>
+
+  <div
+    *ngIf="message"
+    class="alert"
+    [style.background]="
+      message.toLowerCase().includes('error') ? 'rgba(239, 68, 68, 0.1)' : 'rgba(99, 102, 241, 0.1)'
+    "
+    [style.color]="message.toLowerCase().includes('error') ? '#ef4444' : '#6366f1'"
+    style="padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 1px solid currentColor"
+  >
+    {{ message }}
+  </div>
+
+  <div
+    class="leaves-grid"
+    *ngIf="!isAdmin"
+    style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px; margin-bottom: 30px"
+  >
+    <div
+      class="bento-card"
+      style="background: #111827; border-radius: 16px; padding: 24px; border: 1px solid #1f2937"
+    >
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px">
+        <div style="color: #6366f1">
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M12 4v16m8-8H4"></path>
+          </svg>
+        </div>
+        <h3 style="color: white; margin: 0; font-size: 1.1rem; font-weight: 700">New Request</h3>
+      </div>
+
+      <form (submit)="submitRequest()">
+        <label style="color: #94a3b8; display: block; margin-bottom: 8px; font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">Start Date</label>
+        <input type="date" [(ngModel)]="newRequest.startDate" [min]="minDate" name="startDate" style="width: 100%; background: #1f2937; border: 1px solid #374151; color: white; padding: 12px; border-radius: 8px; margin-bottom: 16px;" required />
+
+        <label style="color: #94a3b8; display: block; margin-bottom: 8px; font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">End Date</label>
+        <input type="date" [(ngModel)]="newRequest.endDate" [min]="newRequest.startDate || minDate" name="endDate" style="width: 100%; background: #1f2937; border: 1px solid #374151; color: white; padding: 12px; border-radius: 8px; margin-bottom: 16px;" required />
+
+        <label style="color: #94a3b8; display: block; margin-bottom: 8px; font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">Leave Type</label>
+        <select [(ngModel)]="newRequest.type" name="type" style="width: 100%; background: #1f2937; border: 1px solid #374151; color: white; padding: 12px; border-radius: 8px; margin-bottom: 16px;" required>
+          <option value="VACATION">Vacation (Annual)</option>
+          <option value="MEDICAL">Medical Leave</option>
+          <option value="UNPAID">Unpaid Leave</option>
+          <option value="SPECIAL">Special Events</option>
+        </select>
+
+        <label style="color: #94a3b8; display: block; margin-bottom: 8px; font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">Reason / Notes</label>
+        <textarea [(ngModel)]="newRequest.reason" name="reason" style="width: 100%; background: #1f2937; border: 1px solid #374151; color: white; padding: 12px; border-radius: 8px; margin-bottom: 24px; height: 80px; resize: none;" placeholder="Optional..."></textarea>
+
+        <button type="submit" [disabled]="isSubmitting || !newRequest.startDate || !newRequest.endDate" style="width: 100%; background: #6366f1; color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer;" [style.opacity]="isSubmitting || !newRequest.startDate || !newRequest.endDate ? 0.5 : 1">
+          {{ isSubmitting ? 'PROCESSING...' : 'Submit Request' }}
+        </button>
+      </form>
+    </div>
+
+    <div class="bento-card" style="background: #111827; border-radius: 16px; padding: 24px; border: 1px solid #1f2937">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 30px">
+        <div style="color: #64748b">
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+          </svg>
+        </div>
+        <h3 style="color: white; margin: 0; font-size: 1.1rem; font-weight: 700">My Requests</h3>
+      </div>
+
+      <div style="overflow-x: auto">
+        <table style="width: 100%; border-collapse: separate; border-spacing: 0 12px; margin-top: -12px">
+          <thead>
+            <tr style="text-align: left">
+              <th style="color: #64748b; font-size: 0.75rem; text-transform: uppercase; padding: 0 12px;">ID & Type</th>
+              <th style="color: #64748b; font-size: 0.75rem; text-transform: uppercase; padding: 0 12px;">Period / Reason</th>
+              <th style="color: #64748b; font-size: 0.75rem; text-transform: uppercase; padding: 0 12px;">Status</th>
+              <th style="color: #64748b; font-size: 0.75rem; text-transform: uppercase; padding: 0 12px; text-align: center;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let req of myRequests; trackBy: trackByRequestId">
+              <tr style="background: rgba(31, 41, 55, 0.4)">
+                <td style="padding: 16px 12px; border-radius: 12px 0 0 12px">
+                  <div style="color: #94a3b8; font-family: monospace; font-size: 0.75rem">#{{ req?.id }}</div>
+                  <div style="color: #6366f1; font-weight: 700; font-size: 0.7rem">{{ req?.type }}</div>
+                </td>
+                <td style="padding: 16px 12px; color: white; font-weight: 500">
+                  <div style="font-family: monospace; font-size: 0.9rem">{{ req?.startDate }} → {{ req?.endDate }}</div>
+                  <div style="color: #64748b; font-size: 0.75rem; margin-top: 4px; font-weight: 400" *ngIf="req.reason">Note: {{ req.reason }}</div>
+                </td>
+                <td style="padding: 16px 12px">
+                  <span [style.background]="req?.status === 'PENDING' ? 'rgba(245, 158, 11, 0.1)' : req?.status === 'APPROVED' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)'"
+                        [style.color]="req?.status === 'PENDING' ? '#f59e0b' : req?.status === 'APPROVED' ? '#22c55e' : '#ef4444'"
+                        style="padding: 6px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; border: 1px solid currentColor; display: inline-block; white-space: nowrap;">
+                    ● {{ req?.status }}
+                  </span>
+                </td>
+                <td style="padding: 16px 12px; border-radius: 0 12px 12px 0; text-align: center">
+                  <button *ngIf="req.status === 'PENDING'" (click)="deleteRequest(req.id)" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); padding: 8px; border-radius: 8px; cursor: pointer;">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                  </button>
+                  <span *ngIf="req.status !== 'PENDING'" style="color: #4b5563; font-size: 0.8rem">🔒</span>
+                </td>
+              </tr>
+              <tr *ngIf="req.status === 'REJECTED' && req.managerComment">
+                <td colspan="4" style="padding: 0 12px 12px 12px; margin-top: -8px">
+                  <div style="background: rgba(239, 68, 68, 0.05); border: 1px dashed rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 10px; color: #ef4444; font-size: 0.8rem; display: flex; gap: 8px; align-items: center;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <strong>Rejection Reason:</strong> {{ req.managerComment }}
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+        <div *ngIf="myRequests.length === 0" style="padding: 20px; text-align: center; color: #4b5563">No personal history yet.</div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="isManager || isAdmin" style="margin-top: 40px">
+    <div class="bento-card" style="background: #111827; border-radius: 16px; padding: 24px; border: 1px solid #1f2937">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 30px">
+        <div style="color: #6366f1">
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          </svg>
+        </div>
+        <h3 style="color: white; margin: 0; font-size: 1.1rem; font-weight: 700">
+          {{ isAdmin ? 'Global Registry' : 'Team Requests' }}
+        </h3>
+      </div>
+
+      <div style="overflow-x: auto">
+        <table style="width: 100%; border-collapse: separate; border-spacing: 0 12px; margin-top: -12px">
+          <thead>
+            <tr style="text-align: left">
+              <th style="color: #64748b; font-size: 0.75rem; text-transform: uppercase; padding: 0 12px;">Employee</th>
+              <th style="color: #64748b; font-size: 0.75rem; text-transform: uppercase; padding: 0 12px;">Period / Type</th>
+              <th style="color: #64748b; font-size: 0.75rem; text-transform: uppercase; padding: 0 12px;">Status & Notes</th>
+              <th style="color: #64748b; font-size: 0.75rem; text-transform: uppercase; padding: 0 12px; text-align: center;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let req of teamRequests; trackBy: trackByRequestId" style="background: rgba(31, 41, 55, 0.4)">
+              <td style="padding: 16px 12px; border-radius: 12px 0 0 12px">
+                <div style="color: white; font-weight: 600">{{ req.employee?.firstName }} {{ req.employee?.lastName }}</div>
+                <div style="color: #64748b; font-size: 0.7rem">{{ req.employee?.position }}</div>
+              </td>
+              <td style="padding: 16px 12px; color: white; font-family: monospace; font-size: 0.85rem">
+                <div>{{ req.startDate }} / {{ req.endDate }}</div>
+                <div style="color: #94a3b8; font-size: 0.75rem; font-family: sans-serif; margin-top: 4px;">{{ req.type }}</div>
+              </td>
+              <td style="padding: 16px 12px">
+                <div [style.color]="req?.status === 'PENDING' ? '#f59e0b' : req?.status === 'APPROVED' ? '#22c55e' : '#ef4444'" style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase">
+                  {{ req.status }}
+                </div>
+                <div style="color: #64748b; font-size: 0.75rem; margin-top: 4px; max-width: 200px" *ngIf="req.reason">Reason: {{ req.reason }}</div>
+              </td>
+              <td style="padding: 16px 12px; border-radius: 0 12px 12px 0; text-align: center">
+                <div *ngIf="req.status === 'PENDING'" style="display: flex; flex-direction: column; gap: 8px; align-items: center">
+                  
+                  <div *ngIf="req.employee?.role !== 'MANAGER' && req.employee?.id !== currentUserId; else restrictedView" style="display: flex; gap: 8px">
+                    <button (click)="approveRequest(req.id)" style="background: #059669; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 600;">Approve</button>
+                    <button (click)="toggleRejectBox(req.id)" style="background: #dc2626; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 600;">Reject</button>
+                  </div>
+
+                  <ng-template #restrictedView>
+                    <span style="color: #64748b; font-size: 0.7rem; font-style: italic;">
+                      {{ req.employee?.id === currentUserId ? 'Self-Request' : 'Manager Request' }}
+                    </span>
+                  </ng-template>
+
+                  <div *ngIf="showRejectInput[req.id]" style="margin-top: 10px; display: flex; flex-direction: column; gap: 5px; background: #1f2937; padding: 10px; border-radius: 8px; border: 1px solid #dc2626;">
+                    <textarea #rejReason style="background: #111827; border: 1px solid #374151; color: white; border-radius: 4px; padding: 5px; font-size: 0.75rem; resize: none;" placeholder="Why reject?"></textarea>
+                    <button (click)="rejectRequest(req.id, rejReason.value)" style="background: #dc2626; color: white; border: none; padding: 5px; border-radius: 4px; font-size: 0.7rem; cursor: pointer; font-weight: 700;">Confirm Rejection</button>
+                  </div>
+                </div>
+
+                <div *ngIf="req.status !== 'PENDING'">
+                  <div style="color: #4b5563; font-size: 0.7rem; font-style: italic">Processed</div>
+                  <div style="color: #ef4444; font-size: 0.7rem; margin-top: 4px" *ngIf="req.status === 'REJECTED' && req.managerComment">
+                    Feedback: {{ req.managerComment }}
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

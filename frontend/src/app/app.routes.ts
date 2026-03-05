@@ -10,7 +10,7 @@ import { roleGuard } from './services/role.guard';
 
 import { Dashboard } from './components/dashboard/dashboard';
 import { Projects } from './components/projects/projects';
-import { Leaves } from './components/leaves/leaves';
+import { LeavesComponent } from './components/leaves/leaves';
 
 export const routes: Routes = [
   {
@@ -60,7 +60,7 @@ export const routes: Routes = [
       },
       {
         path: 'leaves',
-        component: Leaves,
+        component: LeavesComponent,
       },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],

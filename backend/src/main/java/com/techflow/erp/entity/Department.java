@@ -26,6 +26,7 @@ public class Department {
 
     // Managerul departamentului este tot un angajat
     @OneToOne
+    @JsonIgnore
     @JoinColumn(name = "manager_id")
     private Employee manager;
 

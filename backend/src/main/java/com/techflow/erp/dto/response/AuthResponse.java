@@ -11,4 +11,5 @@ public class AuthResponse {
     private String role;
     private boolean needsPasswordChange;
     private Long userId;
+    private Long departmentId;
 }

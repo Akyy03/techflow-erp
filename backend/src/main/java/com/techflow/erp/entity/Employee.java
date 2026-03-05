@@ -1,5 +1,7 @@
 package com.techflow.erp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,6 +9,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "employees")
@@ -19,9 +22,13 @@ public class Employee {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Relatia 1:1 cu User (pentru login/security mai târziu)
+    @OneToMany(mappedBy = "employee")
+    @JsonIgnore
+    private List<LeaveRequest> leaveRequests;
+
     @OneToOne(cascade = CascadeType.ALL, optional = true)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = true)
+    @JsonIgnore
     private User user;
 
     @Column(name = "first_name", nullable = false)
@@ -60,4 +67,10 @@ public class Employee {
 
     @Transient
     private String role;
+
+    @Column(name = "remaining_leave_days", nullable = false)
+    private Integer remainingLeaveDays = 21;
+
+    @Column(name = "total_leave_days", nullable = false)
+    private Integer totalLeaveDays = 21;
 }

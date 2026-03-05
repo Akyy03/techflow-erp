@@ -10,6 +10,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -59,6 +61,12 @@ public class EmployeeService {
             employee.setUser(newUser);
         }
 
+        if (employee.getUser() != null) {
+            employee.setRole(employee.getUser().getRole().name());
+        }
+
+        calculateLeaveDays(employee);
+
         Employee saved = employeeRepository.save(employee);
         return mapToResponse(saved);
     }
@@ -79,11 +87,16 @@ public class EmployeeService {
         // 2. ACTUALIZARE ROL (Sincronizare cu tabelul Users)
         if (empDetails.getRole() != null && employee.getUser() != null) {
             try {
-                employee.getUser().setRole(Role.valueOf(empDetails.getRole()));
+                Role newRole = Role.valueOf(empDetails.getRole());
+                employee.getUser().setRole(newRole);
+                // Sincronizăm și câmpul transient role pentru calculateLeaveDays
+                employee.setRole(newRole.name());
             } catch (IllegalArgumentException e) {
-                // Dacă rolul trimis nu e valid în Enum, rămâne cel vechi sau dă eroare
                 System.err.println("Invalid role received: " + empDetails.getRole());
             }
+        } else if (employee.getUser() != null) {
+            // Dacă nu primim rol nou în empDetails, ne asigurăm că cel existent e setat în câmpul transient pentru calcul
+            employee.setRole(employee.getUser().getRole().name());
         }
 
         // 3. Actualizare câmpuri de bază
@@ -100,6 +113,10 @@ public class EmployeeService {
         if (empDetails.getDepartment() != null) {
             employee.setDepartment(empDetails.getDepartment());
         }
+
+        // 4. RECALCULARE ZILE CONCEDIU
+        // Apelăm metoda chiar înainte de salvare pentru a reflecta orice schimbare de rol sau hireDate
+        calculateLeaveDays(employee);
 
         Employee updated = employeeRepository.save(employee);
         return mapToResponse(updated);
@@ -170,5 +187,37 @@ public class EmployeeService {
         }
 
         return employeeRepository.save(employee);
+    }
+
+    private void calculateLeaveDays(Employee employee) {
+        // 1. Dacă e ADMIN, nu are zile de concediu (0)
+        if ("ADMIN".equalsIgnoreCase(employee.getRole())) {
+            employee.setTotalLeaveDays(0);
+            employee.setRemainingLeaveDays(0);
+            return;
+        }
+
+        // 2. Baza: 21 zile
+        int baseDays = 21;
+
+        // 3. Bonus de Rol: MANAGER (+2 zile)
+        if ("MANAGER".equalsIgnoreCase(employee.getRole())) {
+            baseDays += 2;
+        }
+
+        // 4. Bonus de Vechime (+1 zi pentru fiecare an întreg lucrat)
+        int seniorityBonus = 0;
+        if (employee.getHireDate() != null) {
+            seniorityBonus = Period.between(employee.getHireDate(), LocalDate.now()).getYears();
+        }
+
+        // 5. Calcul Total și Plafonare la 28 de zile
+        int total = Math.min(baseDays + seniorityBonus, 28);
+
+        employee.setTotalLeaveDays(total);
+
+        if (employee.getRemainingLeaveDays() == null || employee.getRemainingLeaveDays() == 0) {
+            employee.setRemainingLeaveDays(total);
+        }
     }
 }
