@@ -18,7 +18,10 @@ export class AuthService {
         localStorage.setItem('role', response.role);
         localStorage.setItem('email', response.email);
         localStorage.setItem('userId', String(response.userId));
-        localStorage.setItem('deptId', response.departmentId ? response.departmentId.toString() : '0');
+        localStorage.setItem(
+          'deptId',
+          response.departmentId ? response.departmentId.toString() : '0',
+        );
         localStorage.setItem('needsPasswordChange', String(response.needsPasswordChange));
       }),
     );
@@ -50,5 +53,9 @@ export class AuthService {
 
   isEmployee(): boolean {
     return this.getRole() === 'EMPLOYEE';
+  }
+
+  getUserEmail(): string {
+    return localStorage.getItem('email') || '';
   }
 }

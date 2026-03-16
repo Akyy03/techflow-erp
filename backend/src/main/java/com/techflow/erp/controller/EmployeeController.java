@@ -8,6 +8,7 @@ import com.techflow.erp.service.LeaveCalculationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -53,5 +54,15 @@ public class EmployeeController {
     @PutMapping("/{id}/restore")
     public ResponseEntity<Employee> restoreEmployee(@PathVariable Long id) {
         return ResponseEntity.ok(employeeService.restoreEmployee(id));
+    }
+
+    @GetMapping("/me/{email}")
+    public ResponseEntity<Employee> getMyProfile(@PathVariable String email) {
+        return ResponseEntity.ok(employeeService.findByEmail(email));
+    }
+
+    @PutMapping("/me/update/{email}")
+    public ResponseEntity<Employee> updateMyProfile(@PathVariable String email, @RequestBody Employee updatedData) {
+        return ResponseEntity.ok(employeeService.updateOwnProfile(email, updatedData));
     }
 }

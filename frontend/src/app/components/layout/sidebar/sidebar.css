@@ -81,3 +81,219 @@
   background: #ef4444;
   color: white;
 }
+
+/* --- Overlay-ul care acoperă tot ecranul --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(2, 6, 23, 0.7); /* Fundal întunecat transparent */
+  backdrop-filter: blur(8px); /* Efectul de înghețare a fundalului */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000; /* Peste sidebar */
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* --- Cardul Modal (Glassmorphism) --- */
+.modal-card {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 24px;
+  padding: 32px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  color: white;
+  text-align: center;
+  animation: slideUp 0.3s ease-out;
+}
+
+.modal-card h3 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+  letter-spacing: -0.5px;
+}
+
+.modal-card p {
+  color: #94a3b8;
+  margin-bottom: 24px;
+  font-size: 0.95rem;
+}
+
+/* --- Stiluri Formular (Input-uri) --- */
+.modal-input {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(2, 6, 23, 0.5);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 12px;
+  color: white;
+  margin-bottom: 20px;
+  outline: none;
+  transition: 0.3s;
+}
+
+.modal-input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+/* --- Butoane Modal --- */
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.btn-secondary {
+  background: rgba(148, 163, 184, 0.1);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  padding: 12px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.btn-secondary:hover {
+  background: rgba(148, 163, 184, 0.2);
+  color: white;
+}
+
+.btn-danger {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+}
+
+.btn-save {
+  background: #6366f1;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.btn-save:hover {
+  background: #4f46e5;
+  transform: translateY(-2px);
+}
+
+/* --- Animații --- */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.user-control-panel {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 coloane perfect egale */
+  gap: 1px; /* Creează o linie fină de demarcație între butoane */
+  background: rgba(99, 102, 241, 0.1); /* O nuanță foarte subtilă de indigo */
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 16px;
+  overflow: hidden; /* Taie colțurile butoanelor pentru a respecta border-radius-ul părintelui */
+  margin-top: auto; /* Îl împinge jos de tot */
+}
+
+.control-btn {
+  background: transparent;
+  border: none;
+  padding: 15px 0;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #94a3b8;
+}
+
+.control-btn:hover {
+  background: rgba(99, 102, 241, 0.2);
+  color: #6366f1;
+}
+
+/* Butonul de logout are un hover special pe roșu */
+.control-btn.logout-trigger:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+.control-icon {
+  font-size: 1.2rem;
+  filter: grayscale(100%) opacity(0.7); /* Face iconițele emoji să pară mai profesionale */
+  transition: 0.3s;
+}
+
+.control-btn:hover .control-icon {
+  filter: grayscale(0%) opacity(1);
+  transform: scale(1.1);
+}
+
+/* Stil pentru separatorul vertical între butoane */
+.control-btn:not(:last-child) {
+  border-right: 1px solid rgba(99, 102, 241, 0.1);
+}
+
+/* Stil pentru textul de Logout al Adminului */
+.logout-text {
+  margin-left: 10px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 1.5px; /* Aspect de buton de comandă */
+  color: #f87171;
+  text-transform: uppercase;
+  transition: 0.3s;
+}
+
+/* Când Adminul are butonul pe toată lățimea */
+.control-btn.full-width {
+  grid-column: span 3;
+  padding: 18px 0;
+  background: rgba(239, 68, 68, 0.05); /* O tentă roșiatică foarte fină */
+}
+
+.control-btn.full-width:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.control-btn.full-width:hover .logout-text {
+  color: white;
+  letter-spacing: 2px; /* Efect subtil de expandare la hover */
+}
+
+/* Schimbăm iconița să fie mai vizibilă la Admin */
+.control-btn.full-width .control-icon {
+  font-size: 1.3rem;
+  filter: none; /* Fără grayscale pentru Admin */
+  color: #ef4444;
+}
+
+.control-btn.full-width:hover .control-icon {
+  color: white;
+  transform: rotate(90deg); /* Se rotește ușor la hover pentru efect dinamic */
+} 

@@ -28,7 +28,7 @@ public class Employee {
 
     @OneToOne(cascade = CascadeType.ALL, optional = true)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = true)
-    @JsonIgnore
+    @JsonManagedReference
     private User user;
 
     @Column(name = "first_name", nullable = false)

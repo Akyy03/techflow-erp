@@ -1,5 +1,6 @@
 package com.techflow.erp.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.techflow.erp.constant.Role;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -47,5 +48,6 @@ public class User {
     private LocalDateTime updatedAt;
 
     @OneToOne(mappedBy = "user")
+    @JsonBackReference
     private Employee employee;
 }

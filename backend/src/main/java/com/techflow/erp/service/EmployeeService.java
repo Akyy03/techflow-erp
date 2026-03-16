@@ -122,6 +122,38 @@ public class EmployeeService {
         return mapToResponse(updated);
     }
 
+    public Employee findByEmail(String email) {
+        // Căutăm angajatul pornind de la user-ul care are acel email
+        return employeeRepository.findByUserEmail(email)
+                .orElseThrow(() -> new RuntimeException("Profilul nu a fost găsit pentru email: " + email));
+    }
+
+    @Transactional
+    public Employee updateOwnProfile(String email, Employee updatedData) {
+        Employee existingEmployee = findByEmail(email);
+        User currentUser = existingEmployee.getUser();
+
+        // 1. Update Telefon (din Employee)
+        if (updatedData.getPhone() != null) {
+            existingEmployee.setPhone(updatedData.getPhone());
+        }
+
+        // 2. Update Parolă (din User)
+        if (updatedData.getUser() != null) {
+            User userUpdate = updatedData.getUser();
+
+            if (userUpdate.getPassword() != null && !userUpdate.getPassword().isEmpty()) {
+                // Setăm parola nouă criptată
+                currentUser.setPassword(passwordEncoder.encode(userUpdate.getPassword()));
+
+                // Foarte important: Ștergem parola temporară pentru a marca procesul de schimbare ca finalizat
+                currentUser.setTempPasswordPlain(null);
+            }
+        }
+
+        return employeeRepository.save(existingEmployee);
+    }
+
     // --- METODE HELPER (Private) ---
 
     private void validateEmailDomain(String email) {

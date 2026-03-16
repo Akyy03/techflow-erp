@@ -60,4 +60,12 @@ export class EmployeeService {
   restoreEmployee(id: number): Observable<Employee> {
     return this.http.put<Employee>(`${this.apiUrl}/${id}/restore`, {});
   }
+
+  getMyProfile(email: string): Observable<Employee> {
+    return this.http.get<Employee>(`${this.apiUrl}/me/${email}`);
+  }
+
+  updateMyProfile(email: string, data: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/me/update/${email}`, data);
+  }
 }
