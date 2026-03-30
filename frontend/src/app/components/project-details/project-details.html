@@ -1,0 +1,103 @@
+<div class="kanban-wrapper">
+  <div class="project-header-bento">
+    <div class="title-group">
+      <h1 class="project-title" *ngIf="!isEditing">
+        {{project.name}}
+      </h1>
+      <input *ngIf="isEditing" [(ngModel)]="editModel.name" class="edit-input-title" placeholder="Project Name">
+
+      <div class="project-meta">
+        <span class="project-id-badge">ID_PRJ_0{{projectId}}</span>
+        
+        <span class="deadline-badge" *ngIf="!isEditing">📅 {{project.deadline || 'No deadline'}}</span>
+        <input *ngIf="isEditing" type="date" [(ngModel)]="editModel.deadline" class="edit-input-date">
+        
+        <div class="dept-badges">
+          <span class="dept-tag" *ngFor="let deptId of projectDepartmentIds">
+            {{ getDepartmentName(deptId) }}
+            <button class="btn-remove-dept" (click)="removeDept(deptId)">&times;</button>
+          </span>
+
+          <select (change)="assignDepartment($event)" class="add-dept-select">
+            <option value="" disabled selected>+ Add Dept</option>
+            <option *ngFor="let d of getAvailableDepartments()" [value]="d.id">
+              {{d.name}}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <p class="project-desc" *ngIf="!isEditing">{{project.description}}</p>
+      <textarea *ngIf="isEditing" [(ngModel)]="editModel.description" class="edit-input-desc" placeholder="Description"></textarea>
+    </div>
+
+    <div class="project-actions">
+      <ng-container *ngIf="!isEditing">
+        <button class="btn-edit-project" (click)="startEdit()">✏️ Edit</button>
+        <button class="btn-delete-project" (click)="deleteProject()">🗑️ Delete</button>
+        <button class="btn-add-task">+ New Task</button>
+      </ng-container>
+      
+      <ng-container *ngIf="isEditing">
+        <button class="btn-save-project" (click)="saveProjectChanges()">💾 Save</button>
+        <button class="btn-cancel-project" (click)="cancelEdit()">❌ Cancel</button>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="kanban-board" cdkDropListGroup>
+    <div class="kanban-column">
+      <div class="column-header">
+        <div class="status-indicator todo"></div>
+        <h3>TO DO</h3>
+        <span class="count-badge">{{todoTasks.length}}</span>
+      </div>
+      <div class="task-list" id="TODO" cdkDropList [cdkDropListData]="todoTasks" [cdkDropListConnectedTo]="['IN_PROGRESS', 'DONE']" (cdkDropListDropped)="drop($event)">
+        <div class="task-card bento-item" *ngFor="let task of todoTasks" cdkDrag>
+          <h4>{{task.title}}</h4>
+          <p>{{task.description}}</p>
+          <div class="task-footer">
+            <span class="assignee-tag">👤 {{task.assignedToName || 'Unassigned'}}</span>
+          </div>
+          <div class="drag-placeholder" *cdkDragPlaceholder></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="kanban-column">
+      <div class="column-header">
+        <div class="status-indicator progress"></div>
+        <h3>IN PROGRESS</h3>
+        <span class="count-badge">{{inProgressTasks.length}}</span>
+      </div>
+      <div class="task-list" id="IN_PROGRESS" cdkDropList [cdkDropListData]="inProgressTasks" [cdkDropListConnectedTo]="['TODO', 'DONE']" (cdkDropListDropped)="drop($event)">
+        <div class="task-card bento-item in-progress-border" *ngFor="let task of inProgressTasks" cdkDrag>
+          <h4>{{task.title}}</h4>
+          <p>{{task.description}}</p>
+          <div class="task-footer">
+            <span class="assignee-tag">👤 {{task.assignedToName || 'Unassigned'}}</span>
+          </div>
+          <div class="drag-placeholder" *cdkDragPlaceholder></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="kanban-column">
+      <div class="column-header">
+        <div class="status-indicator done"></div>
+        <h3>COMPLETED</h3>
+        <span class="count-badge">{{doneTasks.length}}</span>
+      </div>
+      <div class="task-list" id="DONE" cdkDropList [cdkDropListData]="doneTasks" [cdkDropListConnectedTo]="['TODO', 'IN_PROGRESS']" (cdkDropListDropped)="drop($event)">
+        <div class="task-card bento-item done-border" *ngFor="let task of doneTasks" cdkDrag>
+          <h4>{{task.title}}</h4>
+          <p>{{task.description}}</p>
+          <div class="task-footer">
+            <span class="assignee-tag">👤 {{task.assignedToName || 'Unassigned'}}</span>
+          </div>
+          <div class="drag-placeholder" *cdkDragPlaceholder></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

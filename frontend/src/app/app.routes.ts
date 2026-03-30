@@ -9,10 +9,11 @@ import { guestGuard } from './services/guest.guard';
 import { roleGuard } from './services/role.guard';
 
 import { Dashboard } from './components/dashboard/dashboard';
-import { Projects } from './components/projects/projects';
+import { ProjectsComponent } from './components/projects/projects';
 import { LeavesComponent } from './components/leaves/leaves';
 import { MyDepartmentComponent } from './components/my-department/my-department';
 import { Reports } from './components/reports/reports';
+import { ProjectDetailsComponent } from './components/project-details/project-details';
 
 export const routes: Routes = [
   {
@@ -71,7 +72,15 @@ export const routes: Routes = [
       },
       {
         path: 'projects',
-        component: Projects,
+        component: ProjectsComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN', 'MANAGER'] },
+      },
+      {
+        path: 'projects/:id',
+        component: ProjectDetailsComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN', 'MANAGER'] },
       },
       {
         path: 'leaves',
