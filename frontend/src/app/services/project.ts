@@ -10,6 +10,7 @@ export interface Project {
   status: 'ACTIVE' | 'ON_HOLD' | 'COMPLETED';
   progress: number;
   createdByUserName: string;
+  departmentIds: number[];
 }
 
 @Injectable({

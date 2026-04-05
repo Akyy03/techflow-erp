@@ -10,16 +10,16 @@
         <span class="project-id-badge">ID_PRJ_0{{projectId}}</span>
         
         <span class="deadline-badge" *ngIf="!isEditing">📅 {{project.deadline || 'No deadline'}}</span>
-        <input *ngIf="isEditing" type="date" [(ngModel)]="editModel.deadline" class="edit-input-date">
+        <input *ngIf="isEditing" type="date" [(ngModel)]="editModel.deadline" [min]="today" class="edit-input-date">
         
         <div class="dept-badges">
           <span class="dept-tag" *ngFor="let deptId of projectDepartmentIds">
             {{ getDepartmentName(deptId) }}
-            <button class="btn-remove-dept" (click)="removeDept(deptId)">&times;</button>
+            <button *ngIf="userRole === 'ADMIN'" class="btn-remove-dept" (click)="removeDept(deptId)">&times;</button>
           </span>
 
-          <select (change)="assignDepartment($event)" class="add-dept-select">
-            <option value="" disabled selected>+ Add Dept</option>
+          <select *ngIf="userRole === 'ADMIN'" (change)="assignDepartment($event)" class="add-dept-select">
+            <option value="" disabled selected>+ Add Department</option>
             <option *ngFor="let d of getAvailableDepartments()" [value]="d.id">
               {{d.name}}
             </option>
@@ -33,8 +33,9 @@
 
     <div class="project-actions">
       <ng-container *ngIf="!isEditing">
-        <button class="btn-edit-project" (click)="startEdit()">✏️ Edit</button>
-        <button class="btn-delete-project" (click)="deleteProject()">🗑️ Delete</button>
+        <button *ngIf="userRole === 'ADMIN'" class="btn-edit-project" (click)="startEdit()">✏️ Edit</button>
+        <button *ngIf="userRole === 'ADMIN'" class="btn-delete-project" (click)="deleteProject()">🗑️ Delete</button>
+        
         <button class="btn-add-task" (click)="openAddTaskModal()">+ New Task</button>
       </ng-container>
       
@@ -125,8 +126,7 @@
 <app-task-modal
   *ngIf="showTaskModal"
   [projectId]="projectId"
-  [users]="projectMembers"
-  [task]="selectedTask"
+  [users]="visibleMembers"  [task]="selectedTask"
   (closed)="showTaskModal = false"
   (taskCreated)="handleTaskCreated($event)">
 </app-task-modal>

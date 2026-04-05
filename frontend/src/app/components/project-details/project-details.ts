@@ -22,6 +22,10 @@ import { TaskModalComponent } from '../task-modal/task-modal';
 export class ProjectDetailsComponent implements OnInit {
   projectId!: number;
   tasks: Task[] = [];
+  userRole: string = '';
+  userDeptId: number | null = null; // Adăugat pentru filtrare managerială
+
+  today: string = '';
 
   // Gestiune Departamente
   allDepartments: any[] = [];
@@ -36,6 +40,7 @@ export class ProjectDetailsComponent implements OnInit {
   showTaskModal = false;
   selectedTask: any = null;
   projectMembers: any[] = [];
+  visibleMembers: any[] = []; // Lista filtrată care pleacă spre modal
 
   // Coloanele noastre
   todoTasks: Task[] = [];
@@ -51,9 +56,15 @@ export class ProjectDetailsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.today = new Date().toISOString().split('T')[0];
+    
+    // Preluăm datele de identitate
+    this.userRole = localStorage.getItem('role') || '';
+    const storedDeptId = localStorage.getItem('deptId');
+    this.userDeptId = storedDeptId !== null ? Number(storedDeptId) : null;
+
     this.projectId = Number(this.route.snapshot.paramMap.get('id'));
     this.loadAllDepartments();
-    // Încărcăm detaliile proiectului mai întâi pentru a avea ID-urile departamentelor
     this.loadProjectDetails();
   }
 
@@ -68,25 +79,40 @@ export class ProjectDetailsComponent implements OnInit {
   }
 
   loadProjectMembers(): void {
-  this.http.get<any[]>('http://localhost:8080/api/employees').subscribe({
-    next: (allEmployees) => {
-      // 1. Ne asigurăm că avem numere pentru comparație
-      const allowedDepts = this.projectDepartmentIds.map(id => Number(id));
+    this.http.get<any[]>('http://localhost:8080/api/employees').subscribe({
+      next: (allEmployees) => {
+        const allowedDepts = this.projectDepartmentIds.map(id => Number(id));
 
-      // 2. Filtrăm folosind noul câmp departmentId
-      this.projectMembers = allEmployees.filter(emp => {
-        // Dacă proiectul nu are departamente, lista rămâne goală conform logicii tale
-        if (allowedDepts.length === 0) return false;
+        // 1. Populăm projectMembers (toți oamenii din departamentele proiectului)
+        this.projectMembers = allEmployees.filter(emp => {
+          if (allowedDepts.length === 0) return false;
+          return allowedDepts.includes(Number(emp.departmentId));
+        });
 
-        return allowedDepts.includes(Number(emp.departmentId));
-      });
+        // 2. Aplicăm filtrarea de vizibilitate pentru Manager
+        this.filterVisibleMembers();
 
-      console.log('Membri eligibili găsiți:', this.projectMembers);
-      this.cdr.detectChanges();
-    },
-    error: (err) => console.error('Error fetching employees', err)
-  });
-}
+        console.log('Membri proiect:', this.projectMembers);
+        console.log('Membri vizibili pentru asignare:', this.visibleMembers);
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Error fetching employees', err)
+    });
+  }
+
+  filterVisibleMembers(): void {
+    if (this.userRole === 'ADMIN') {
+      // Admin vede toti membrii implicati in proiect
+      this.visibleMembers = [...this.projectMembers];
+    } else if (this.userRole === 'MANAGER' && this.userDeptId !== null) {
+      // Managerul vede doar colegii din propriul departament care sunt in proiect
+      this.visibleMembers = this.projectMembers.filter(member => 
+        Number(member.departmentId) === this.userDeptId
+      );
+    } else {
+      this.visibleMembers = [];
+    }
+  }
 
   loadAllDepartments(): void {
     this.http.get<any[]>('http://localhost:8080/api/departments').subscribe({
@@ -104,7 +130,6 @@ export class ProjectDetailsComponent implements OnInit {
         this.project = project;
         this.projectDepartmentIds = project.departmentIds ? Array.from(project.departmentIds) : [];
         
-        // APELĂM ÎNCĂRCAREA MEMBRILOR ȘI TASK-URILOR DOAR DUPĂ CE AVEM DETALIILE PROIECTULUI
         this.loadProjectMembers();
         this.loadTasks();
         
@@ -114,8 +139,8 @@ export class ProjectDetailsComponent implements OnInit {
     });
   }
 
-  // Metode Editare Proiect
   startEdit() {
+    if (this.userRole !== 'ADMIN') return;
     this.editModel = { ...this.project };
     this.isEditing = true;
   }
@@ -137,20 +162,18 @@ export class ProjectDetailsComponent implements OnInit {
       });
   }
 
-  // Metode Task Modal
   openAddTaskModal() {
-    this.selectedTask = null; // Resetăm pentru task nou
+    this.selectedTask = null;
     this.showTaskModal = true;
   }
 
   openEditTaskModal(task: any): void {
-    this.selectedTask = { ...task }; // Copie pentru a evita modificarea instantanee în UI
+    this.selectedTask = { ...task };
     this.showTaskModal = true;
   }
 
   handleTaskCreated(taskData: any) {
     if (taskData.id) {
-      // CAZUL EDITARE
       this.http.put(`http://localhost:8080/api/tasks/${taskData.id}`, taskData).subscribe({
         next: () => {
           this.loadTasks();
@@ -159,7 +182,6 @@ export class ProjectDetailsComponent implements OnInit {
         error: (err) => alert('Error updating task: ' + err.message)
       });
     } else {
-      // CAZUL CREARE
       const payload = { ...taskData, projectId: this.projectId, status: 'TODO' };
       this.taskService.createTask(payload).subscribe({
         next: (newTask) => {
@@ -195,7 +217,6 @@ export class ProjectDetailsComponent implements OnInit {
       .post(`http://localhost:8080/api/projects/${this.projectId}/departments/${deptId}`, {})
       .subscribe({
         next: () => {
-          // Reîncărcăm detaliile (care vor declanșa și loadProjectMembers)
           this.loadProjectDetails();
           event.target.value = '';
         },

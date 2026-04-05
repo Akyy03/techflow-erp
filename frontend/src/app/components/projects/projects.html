@@ -2,11 +2,14 @@
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px">
     <div>
       <h1 style="color: white; margin: 0; font-size: 2rem; font-weight: 800; letter-spacing: -1px">
-        PROJECT <span style="color: #6366f1">HUB</span>
+        {{ userRole === 'ADMIN' ? 'PROJECT' : 'TEAM' }} <span style="color: #6366f1">{{ userRole === 'ADMIN' ? 'HUB' : 'PROJECTS' }}</span>
       </h1>
-      <p style="color: #64748b; margin-top: 5px; font-weight: 500">Orchestrate and track high-level initiatives</p>
+      <p style="color: #64748b; margin-top: 5px; font-weight: 500">
+        {{ userRole === 'ADMIN' ? 'Orchestrate and track high-level initiatives' : 'Manage initiatives within your department' }}
+      </p>
     </div>
-    <button (click)="openModal()" class="tf-btn-primary" style="width: auto; padding: 12px 24px; display: flex; align-items: center; gap: 8px">
+    
+    <button *ngIf="userRole === 'ADMIN'" (click)="openModal()" class="tf-btn-primary" style="width: auto; padding: 12px 24px; display: flex; align-items: center; gap: 8px">
       <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
       Initiate Project
     </button>
@@ -14,7 +17,7 @@
 
   <div class="projects-grid" *ngIf="!loading; else loader">
     
-    <div class="bento-card" *ngFor="let project of projects" [routerLink]="['/projects', project.id]" style="cursor: pointer">
+    <div class="bento-card" *ngFor="let project of filteredProjects" [routerLink]="['/projects', project.id]" style="cursor: pointer">
       
       <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px">
         <span class="status-badge" [ngClass]="getStatusClass(project.status)">● {{ project.status }}</span>
@@ -54,6 +57,10 @@
           <span style="color: #64748b; font-size: 0.75rem">Owner: <strong style="color: #cbd5e1">{{ project.createdByUserName }}</strong></span>
         </div>
       </div>
+    </div>
+    
+    <div *ngIf="filteredProjects.length === 0" style="grid-column: 1/-1; text-align: center; padding: 40px; color: #64748b;">
+       No active projects found for your department.
     </div>
   </div>
 
