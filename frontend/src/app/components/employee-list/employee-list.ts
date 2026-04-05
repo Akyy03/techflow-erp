@@ -57,10 +57,9 @@ export class EmployeeListComponent implements OnInit {
     const emps = this.filteredEmployees();
 
     if (role === 'ADMIN') {
-      // Admin vede tot
       return emps.reduce((acc, emp) => acc + (emp.salary || 0), 0);
     } else {
-      // Managerul vede doar totalul celor care NU sunt manageri
+      // Filtrăm managerii din calculul bugetului dacă nu suntem ADMIN
       return emps
         .filter((emp) => emp.role !== 'MANAGER')
         .reduce((acc, emp) => acc + (emp.salary || 0), 0);
@@ -77,27 +76,23 @@ export class EmployeeListComponent implements OnInit {
     const displayArchive = this.showDeleted();
     const role = this.userRole();
 
-    return allEmployees.filter((emp: any) => {
-      // 1. Normalizăm statusul de ștergere
-      const isArchived = !!(emp.isDeleted || emp.deleted || emp.is_deleted);
+    return allEmployees.filter((emp) => {
+      const isArchived = !!emp.isDeleted;
 
-      // --- LOGICĂ FILTRARE ROLURI ---
-      if (role === 'MANAGER') {
-        // Managerul nu vede niciodată arhiva în lista principală
-        if (isArchived) return false;
-      } else {
-        // Adminul vede Active sau Archive în funcție de toggle
+      // Filtrare Tab-uri: ADMIN poate comuta între Archive/Active, restul văd doar Active
+      if (role === 'ADMIN') {
         if (displayArchive !== isArchived) return false;
+      } else {
+        if (isArchived) return false;
       }
 
-      // --- LOGICĂ SEARCH ---
+      // Filtru de căutare
       if (query) {
+        const fullName = `${emp.firstName} ${emp.lastName}`.toLowerCase();
         return (
-          emp.firstName?.toLowerCase().includes(query) ||
-          emp.lastName?.toLowerCase().includes(query) ||
+          fullName.includes(query) ||
           emp.position?.toLowerCase().includes(query) ||
-          emp.email?.toLowerCase().includes(query) ||
-          (emp.departmentName && emp.departmentName.toLowerCase().includes(query))
+          emp.departmentName?.toLowerCase().includes(query)
         );
       }
 
@@ -106,7 +101,6 @@ export class EmployeeListComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    // Întâi setăm rolul, apoi încărcăm angajații
     this.userRole.set(localStorage.getItem('role'));
     this.loadEmployees();
     this.loadDepartments();
@@ -121,36 +115,29 @@ export class EmployeeListComponent implements OnInit {
   loadEmployees() {
     this.employeeService.getEmployees().subscribe({
       next: (data: any) => {
-        const employeesArray = Array.isArray(data) ? data : data.content || [];
+        const employeesArray = Array.isArray(data) ? data : (data.content || []);
         const role = this.userRole();
-        const myEmail = localStorage.getItem('email'); // Folosim email-ul unic din storage
+        const myEmail = localStorage.getItem('email');
 
-        // 1. Normalizăm datele (Arhivă, etc.)
+        // Normalizare date
         let normalized = employeesArray.map((emp: any) => ({
           ...emp,
-          isDeleted: !!(emp.isDeleted || emp.deleted || emp.is_deleted),
+          isDeleted: !!(emp.isDeleted || emp.deleted)
         }));
 
-        // 2. Logică specifică pentru MANAGER
+        // Logica de Business pentru Manageri (filtrare pe departament)
         if (role === 'MANAGER' && myEmail) {
-          // Găsim profilul managerului logat folosind email-ul (care e anchor sigur)
-          const myProfile = normalized.find((e: any) => e.email === myEmail);
-
+          const myProfile = normalized.find((e : Employee) => e.email === myEmail);
           if (myProfile) {
             const myDept = myProfile.departmentName;
-            console.log(`Logat ca Manager: ${myEmail} | Departament: ${myDept}`);
-
-            // Păstrăm doar angajații din același departament
-            normalized = normalized.filter((emp: any) => emp.departmentName === myDept);
+            this.employees.set(normalized.filter((e : Employee) => e.departmentName === myDept));
           } else {
-            // Fallback în caz că email-ul de login nu există în lista de angajați
-            console.error('Managerul nu a fost găsit în lista de angajați după email.');
-            normalized = [];
+            this.employees.set([]);
           }
+        } else {
+          // ADMIN sau EMPLOYEE (serverul trimite deja ce trebuie)
+          this.employees.set(normalized);
         }
-
-        // 3. Setăm semnalul cu lista (filtrată sau nu, depinde de rol)
-        this.employees.set(normalized);
       },
       error: (err) => console.error('API Error:', err),
     });
@@ -168,17 +155,14 @@ export class EmployeeListComponent implements OnInit {
     this.isEditMode.set(false);
     this.editingEmployeeId.set(null);
     this.resetForm();
-    this.loadDepartments();
     this.isModalOpen.set(true);
   }
 
   openEditModal(employee: any) {
     this.isEditMode.set(true);
     this.editingEmployeeId.set(employee.id || null);
-    this.loadDepartments();
 
-    const deptName = employee.departmentName;
-    const foundDept = this.departments().find((d: any) => d.name === deptName);
+    const foundDept = this.departments().find((d) => d.name === employee.departmentName);
 
     this.newEmployee = {
       ...employee,
@@ -210,13 +194,6 @@ export class EmployeeListComponent implements OnInit {
     };
   }
 
-  validatePhone(event: any) {
-    const input = event.target;
-    const cleanedValue = input.value.replace(/[^0-9+]/g, '');
-    this.newEmployee.phone = cleanedValue;
-    input.value = cleanedValue;
-  }
-
   // --- CRUD OPERATIONS ---
   saveEmployee() {
     this.errorMessage.set(null);
@@ -227,34 +204,23 @@ export class EmployeeListComponent implements OnInit {
       isDeleted: this.isEditMode() ? !!this.newEmployee.isDeleted : false,
     };
 
-    if (this.isEditMode() && this.editingEmployeeId()) {
-      this.employeeService.updateEmployee(this.editingEmployeeId()!, employeeData).subscribe({
-        next: () => {
-          this.loadEmployees();
-          this.closeModal();
-        },
-        error: (err) => this.handleBackendError(err),
-      });
-    } else {
-      this.employeeService.addEmployee(employeeData).subscribe({
-        next: () => {
-          this.loadEmployees();
-          this.closeModal();
-        },
-        error: (err) => this.handleBackendError(err),
-      });
-    }
+    const request = (this.isEditMode() && this.editingEmployeeId())
+      ? this.employeeService.updateEmployee(this.editingEmployeeId()!, employeeData)
+      : this.employeeService.addEmployee(employeeData);
+
+    request.subscribe({
+      next: () => {
+        this.loadEmployees();
+        this.closeModal();
+      },
+      error: (err) => this.handleBackendError(err),
+    });
   }
 
   deleteEmployee(id: number) {
-    const msg = 'Are you sure you want to archive this employee? Access will be revoked.';
-    if (confirm(msg)) {
+    if (confirm('Are you sure you want to archive this employee?')) {
       this.employeeService.deleteEmployee(id).subscribe({
-        next: () => {
-          this.employees.update((prev) =>
-            prev.map((e) => (e.id === id ? { ...e, isDeleted: true } : e)),
-          );
-        },
+        next: () => this.loadEmployees(),
         error: (err) => console.error('Error archiving employee:', err),
       });
     }
@@ -264,27 +230,21 @@ export class EmployeeListComponent implements OnInit {
     if (confirm('Reactivate this employee and their user account?')) {
       this.employeeService.restoreEmployee(id).subscribe({
         next: () => {
-          this.loadEmployees();
           this.showDeleted.set(false);
-          console.log('Employee restored and list refreshed.');
+          this.loadEmployees();
         },
-        error: (err) => {
-          console.error('Restore failed:', err);
-        },
+        error: (err) => console.error('Restore failed:', err),
       });
     }
   }
 
   private handleBackendError(err: any) {
-    if (err.status === 409 || err.status === 500) {
-      this.errorMessage.set('Identity Conflict: Email or Phone already exists.');
-    } else {
-      this.errorMessage.set('System Error: Operation failed.');
-    }
+    this.errorMessage.set(
+      err.status === 409 ? 'Identity Conflict: Email or Phone already exists.' : 'System Error: Operation failed.'
+    );
   }
 
   viewEmployeeProfile(id: number | undefined) {
-    if (!id) return;
-    this.router.navigate(['/employees', id]);
+    if (id) this.router.navigate(['/employees', id]);
   }
 }

@@ -1,5 +1,6 @@
 package com.techflow.erp.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -20,5 +21,7 @@ public class EmployeeResponse {
     private String hireDate;
     private String role;
     private String temporaryPassword;
+
+    @JsonProperty("isDeleted")
     private boolean isDeleted;
 }

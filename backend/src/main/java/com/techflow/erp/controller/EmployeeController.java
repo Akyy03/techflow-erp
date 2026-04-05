@@ -6,7 +6,10 @@ import com.techflow.erp.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -17,13 +20,19 @@ public class EmployeeController {
     private final EmployeeService employeeService;
 
     @GetMapping
-    public List<EmployeeResponse> getActiveEmployees() {
-        return employeeService.getAllActiveEmployees();
+    public ResponseEntity<List<EmployeeResponse>> getEmployees() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String role = auth.getAuthorities().toString();
+
+        if (role.contains("ADMIN")) {
+            return ResponseEntity.ok(employeeService.getAllEmployeesIncludeDeleted());
+        }
+        return ResponseEntity.ok(employeeService.getAllActiveEmployees());
     }
 
-    @GetMapping("/all")
-    public List<EmployeeResponse> getAllEmployees() {
-        return employeeService.getAllEmployeesIncludeDeleted();
+    @GetMapping("/me/{email}")
+    public ResponseEntity<Employee> getMyProfile(@PathVariable String email) {
+        return ResponseEntity.ok(employeeService.findByEmail(email));
     }
 
     @GetMapping("/{id}")
@@ -50,12 +59,6 @@ public class EmployeeController {
     @PutMapping("/{id}/restore")
     public ResponseEntity<Employee> restoreEmployee(@PathVariable Long id) {
         return ResponseEntity.ok(employeeService.restoreEmployee(id));
-    }
-
-    // --- Rutele pentru Profilul Meu ---
-    @GetMapping("/me/{email}")
-    public ResponseEntity<Employee> getMyProfile(@PathVariable String email) {
-        return ResponseEntity.ok(employeeService.findByEmail(email));
     }
 
     @PutMapping("/me/update/{email}")

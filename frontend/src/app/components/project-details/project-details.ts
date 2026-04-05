@@ -79,26 +79,21 @@ export class ProjectDetailsComponent implements OnInit {
   }
 
   loadProjectMembers(): void {
-    this.http.get<any[]>('http://localhost:8080/api/employees').subscribe({
-      next: (allEmployees) => {
-        const allowedDepts = this.projectDepartmentIds.map(id => Number(id));
+  this.http.get<any[]>('http://localhost:8080/api/employees').subscribe({
+    next: (allEmployees) => {
+      const allowedDepts = this.projectDepartmentIds.map(id => Number(id));
 
-        // 1. Populăm projectMembers (toți oamenii din departamentele proiectului)
-        this.projectMembers = allEmployees.filter(emp => {
-          if (allowedDepts.length === 0) return false;
-          return allowedDepts.includes(Number(emp.departmentId));
-        });
+      this.projectMembers = allEmployees.filter(emp => {
+        const empDeptId = emp.departmentId || (emp.department ? emp.department.id : null);
+        return allowedDepts.includes(Number(empDeptId));
+      });
 
-        // 2. Aplicăm filtrarea de vizibilitate pentru Manager
-        this.filterVisibleMembers();
-
-        console.log('Membri proiect:', this.projectMembers);
-        console.log('Membri vizibili pentru asignare:', this.visibleMembers);
-        this.cdr.detectChanges();
-      },
-      error: (err) => console.error('Error fetching employees', err)
-    });
-  }
+      this.filterVisibleMembers();
+      this.cdr.detectChanges();
+    },
+    error: (err) => console.error('Error fetching employees', err)
+  });
+}
 
   filterVisibleMembers(): void {
     if (this.userRole === 'ADMIN') {
@@ -173,26 +168,33 @@ export class ProjectDetailsComponent implements OnInit {
   }
 
   handleTaskCreated(taskData: any) {
-    if (taskData.id) {
-      this.http.put(`http://localhost:8080/api/tasks/${taskData.id}`, taskData).subscribe({
-        next: () => {
-          this.loadTasks();
-          this.showTaskModal = false;
-        },
-        error: (err) => alert('Error updating task: ' + err.message)
-      });
-    } else {
-      const payload = { ...taskData, projectId: this.projectId, status: 'TODO' };
-      this.taskService.createTask(payload).subscribe({
-        next: (newTask) => {
-          this.todoTasks.push(newTask);
-          this.showTaskModal = false;
-          this.cdr.detectChanges();
-        },
-        error: (err) => alert('Error creating task: ' + err.message),
-      });
-    }
+  if (taskData.id) {
+    // EDIT
+    this.http.put(`http://localhost:8080/api/tasks/${taskData.id}`, taskData).subscribe({
+      next: () => {
+        this.showTaskModal = false;
+        this.loadTasks(); // Obligatoriu refresh la listă
+      },
+      error: (err) => alert('Edit error: ' + err.message)
+    });
+  } else {
+    // CREATE
+    // Ne asigurăm că payload-ul are exact ce vrea backend-ul
+    const payload = {
+      ...taskData,
+      projectId: this.projectId,
+      status: 'TODO'
+    };
+
+    this.taskService.createTask(payload).subscribe({
+      next: () => {
+        this.showTaskModal = false;
+        this.loadTasks(); // În loc de push manual, dăm refresh total pentru siguranță
+      },
+      error: (err) => alert('Create error: ' + err.message)
+    });
   }
+}
 
   deleteTask(taskId: number): void {
     if (confirm('Are you sure you want to terminate this task?')) {
