@@ -80,5 +80,4 @@ public class TaskController {
     public ResponseEntity<List<TaskDTO>> getMyTasks(@PathVariable Long userId) {
         return ResponseEntity.ok(taskService.getTasksByUserId(userId));
     }
-
 }

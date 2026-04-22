@@ -1,11 +1,9 @@
 <div class="dashboard-shell">
   @if (userRole === 'EMPLOYEE') {
     <app-employee-dashboard></app-employee-dashboard>
-  }
-  @else if (userRole === 'MANAGER') {
+  } @else if (userRole === 'MANAGER') {
     <p>Loading Manager Dashboard...</p>
-  }
-  @else if (userRole === 'ADMIN') {
-    <p>Loading Admin Dashboard...</p>
+  } @else if (userRole === 'ADMIN') {
+    <app-admin-dashboard></app-admin-dashboard>
   }
 </div>

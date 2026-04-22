@@ -19,9 +19,9 @@
     </div>
   </div>
 
-  <h2 class="section-title">ACTIVE ASSIGNMENTS</h2>
+  <h2 class="section-title">UPCOMING ASSIGNMENTS</h2>
   <div class="tasks-list">
-    @for (task of activeTasks; track task.id) {
+    @for (task of upcomingTasks; track task.id) {
       <div class="bento-card task-row">
         <div class="task-info">
           <h3 class="task-title">{{ task.title }}</h3>
@@ -30,7 +30,10 @@
         <span class="badge">{{ task.status }}</span>
       </div>
     } @empty {
-      <p style="color: #64748b; font-size: 0.9rem;">No active assignments.</p>
+      <p style="color: #64748b; font-size: 0.9rem">No upcoming assignments.</p>
+    }
+    @if (activeTasks.length > 3) {
+      <a href="/my-tasks" class="view-all-link">View all tasks...</a>
     }
   </div>
 </div>

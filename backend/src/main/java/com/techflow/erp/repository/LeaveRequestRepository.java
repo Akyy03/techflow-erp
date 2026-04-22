@@ -39,4 +39,6 @@ public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Long
     // Metoda cheie pentru legătura cu User ID
     @Query("SELECT lr FROM LeaveRequest lr WHERE lr.employee.user.id = :userId ORDER BY lr.startDate DESC")
     List<LeaveRequest> findAllByUserId(@Param("userId") Long userId);
+
+    long countByStatus(LeaveStatus status);
 }

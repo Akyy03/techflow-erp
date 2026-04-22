@@ -38,4 +38,13 @@ export class EmployeeDashboardComponent implements OnInit {
       });
     }
   }
+
+  get upcomingTasks() {
+  if (!this.activeTasks) return [];
+
+  return [...this.activeTasks]
+    .filter(task => task.status !== 'DONE') 
+    .sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime())
+    .slice(0, 3);
+}
 }

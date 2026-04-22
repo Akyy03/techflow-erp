@@ -1,5 +1,6 @@
 package com.techflow.erp.repository;
 
+import com.techflow.erp.constant.ProjectStatus;
 import com.techflow.erp.entity.Project;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -12,4 +13,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     List<Project> findByCreatedById(Long userId);
 
     List<Project> findAllByDepartmentsId(Long departmentId);
+
+    long countByStatus(ProjectStatus status);
 }

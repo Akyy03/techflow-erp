@@ -82,7 +82,7 @@ export class LeavesComponent implements OnInit {
   loadEmployeeRequests() {
     this.leaveService.getMyRequests(this.currentUserId).subscribe({
       next: (data) => {
-        this.myRequests = [...data];
+        this.myRequests = [...data].sort((a, b) => b.id - a.id);
         
         // Extragem balanța din obiectul employee al primei cereri gasite
         if (data && data.length > 0 && data[0].employee) {
@@ -104,7 +104,7 @@ export class LeavesComponent implements OnInit {
         this.teamRequests = all.filter(req => 
           req.employee?.position !== 'Architect' && 
           req.employee?.id !== this.currentUserId
-        );
+        ).sort((a, b) => b.id - a.id);
         this.cdr.detectChanges();
       }
     });
@@ -115,7 +115,7 @@ export class LeavesComponent implements OnInit {
       next: (data) => {
         this.teamRequests = (data || []).filter(
           (req: any) => req.employee.id !== this.currentUserId
-        );
+        ).sort((a, b) => b.id - a.id);
         this.cdr.detectChanges();
       },
       error: (err) => (this.message = 'Error loading global registry.'),

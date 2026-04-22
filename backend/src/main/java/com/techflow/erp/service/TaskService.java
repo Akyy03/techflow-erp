@@ -11,7 +11,10 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -104,4 +107,21 @@ public class TaskService {
                 .collect(Collectors.toList());
     }
 
+    public List<TaskDTO> getRecentTasks() {
+        return taskRepository.findTop3ByStatusNotOrderByDeadlineAsc(TaskStatus.DONE)
+                .stream()
+                .map(this::convertToDTO) // Presupun că ai o metodă de conversie
+                .collect(Collectors.toList());
+    }
+
+    public List<Map<String, Object>> getTaskStatistics() {
+        return Arrays.stream(TaskStatus.values())
+                .map(status -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("name", status.name());
+                    map.put("value", taskRepository.countByStatus(status));
+                    return map;
+                })
+                .collect(Collectors.toList());
+    }
 }

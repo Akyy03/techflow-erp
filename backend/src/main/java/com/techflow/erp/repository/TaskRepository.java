@@ -4,6 +4,8 @@ import com.techflow.erp.constant.TaskStatus;
 import com.techflow.erp.entity.Task;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -19,4 +21,10 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     // Numarul total de task-uri dintr-un proiect
     long countByProjectId(Long projectId);
+
+    long countByStatusNotAndDeadlineBefore(TaskStatus status, LocalDate deadline);
+
+    List<Task> findTop3ByStatusNotOrderByDeadlineAsc(TaskStatus status);
+
+    long countByStatus(TaskStatus status);
 }

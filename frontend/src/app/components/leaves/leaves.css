@@ -5,7 +5,6 @@
   padding: 40px;
   max-width: 1400px;
   margin: 0 auto;
-  animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Grid-ul principal: Formular mic în stânga, Tabel mare în dreapta */
