@@ -63,4 +63,9 @@ export class AuthService {
   getUserEmail(): string {
     return localStorage.getItem('email') || '';
   }
+
+  getDeptId(): number {
+  const id = localStorage.getItem('deptId');
+  return id ? parseInt(id, 10) : 0;
+}
 }

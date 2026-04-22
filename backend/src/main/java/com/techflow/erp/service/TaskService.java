@@ -9,6 +9,8 @@ import com.techflow.erp.repository.TaskRepository;
 import com.techflow.erp.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -65,13 +67,11 @@ public class TaskService {
                 .build();
     }
 
-    // Metodă utilă pentru update de status (necesară la Kanban Drag & Drop)
     public TaskDTO updateTaskStatus(Long taskId, String newStatus) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
 
-        // Aici va trebui să te asiguri că TaskStatus e un Enum (TODO, IN_PROGRESS, DONE)
-        // task.setStatus(TaskStatus.valueOf(newStatus));
+        task.setStatus(TaskStatus.valueOf(newStatus));
 
         return convertToDTO(taskRepository.save(task));
     }
@@ -82,7 +82,6 @@ public class TaskService {
                 .orElseThrow(() -> new RuntimeException("Task not found"));
         task.setStatus(newStatus);
         taskRepository.save(task);
-        // JpaRepository va face update automat
     }
 
     @Transactional
@@ -122,6 +121,15 @@ public class TaskService {
                     map.put("value", taskRepository.countByStatus(status));
                     return map;
                 })
+                .collect(Collectors.toList());
+    }
+
+    public List<TaskDTO> getUpcomingTasksByDepartment(Long deptId) {
+        Pageable topFive = PageRequest.of(0, 3);
+
+        return taskRepository.findUpcomingTasksByDepartment(deptId, TaskStatus.DONE, topFive)
+                .stream()
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 }

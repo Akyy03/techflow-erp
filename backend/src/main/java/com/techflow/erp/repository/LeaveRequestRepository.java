@@ -41,4 +41,7 @@ public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Long
     List<LeaveRequest> findAllByUserId(@Param("userId") Long userId);
 
     long countByStatus(LeaveStatus status);
+
+    @Query("SELECT COUNT(lr) FROM LeaveRequest lr WHERE lr.employee.department.id = :deptId AND lr.status = 'PENDING'")
+    long countPendingByDepartmentId(@Param("deptId") Long deptId);
 }

@@ -1,6 +1,6 @@
 package com.techflow.erp.dto.response;
 
-public record AdminStatsDto(
+public record AdminStatsDTO(
         long totalEmployees,
         long activeProjects,
         long pendingLeaves,

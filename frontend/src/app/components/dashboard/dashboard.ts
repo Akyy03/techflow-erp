@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth';
 import { EmployeeDashboardComponent } from './employee/employee-dashboard';
 import { AdminDashboardComponent } from './admin/admin-dashboard';
+import { ManagerDashboardComponent } from './manager/manager-dashboard';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, EmployeeDashboardComponent, AdminDashboardComponent],
+  imports: [CommonModule, EmployeeDashboardComponent, AdminDashboardComponent, ManagerDashboardComponent],
   templateUrl: './dashboard.html'
 })
 export class DashboardComponent implements OnInit {

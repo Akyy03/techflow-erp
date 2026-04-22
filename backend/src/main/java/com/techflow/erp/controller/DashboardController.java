@@ -1,8 +1,7 @@
 package com.techflow.erp.controller;
 
 import com.techflow.erp.dto.TaskDTO;
-import com.techflow.erp.dto.response.AdminStatsDto;
-import com.techflow.erp.entity.Task;
+import com.techflow.erp.dto.response.AdminStatsDTO;
 import com.techflow.erp.service.StatsService;
 import com.techflow.erp.service.TaskService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,7 @@ public class DashboardController {
 
     @GetMapping("/admin-stats")
     @PreAuthorize("hasRole('ADMIN')")
-    public AdminStatsDto getAdminStats() {
+    public AdminStatsDTO getAdminStats() {
         return statsService.getAdminDashboardStats();
     }
 
@@ -35,5 +34,29 @@ public class DashboardController {
     @GetMapping("/task-stats")
     public ResponseEntity<List<Map<String, Object>>> getTaskStats() {
         return ResponseEntity.ok(taskService.getTaskStatistics());
+    }
+
+    @GetMapping("/manager/{deptId}/tasks")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ResponseEntity<List<Map<String, Object>>> getManagerTaskStats(@PathVariable Long deptId) {
+        return ResponseEntity.ok(statsService.getTaskStats(deptId));
+    }
+
+    @GetMapping("/manager/{deptId}/projects")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ResponseEntity<List<Map<String, Object>>> getManagerProjectStats(@PathVariable Long deptId) {
+        return ResponseEntity.ok(statsService.getProjectStats(deptId));
+    }
+
+    @GetMapping("/manager/{deptId}/stats")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ResponseEntity<Map<String, Object>> getManagerStats(@PathVariable Long deptId) {
+        return ResponseEntity.ok(statsService.getManagerStats(deptId));
+    }
+
+    @GetMapping("/manager/{deptId}/upcoming-tasks")
+    @PreAuthorize("hasAnyRole('MANAGER')")
+    public ResponseEntity<List<TaskDTO>> getUpcomingTasks(@PathVariable Long deptId) {
+        return ResponseEntity.ok(taskService.getUpcomingTasksByDepartment(deptId));
     }
 }

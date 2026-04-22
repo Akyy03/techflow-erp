@@ -24,4 +24,5 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
     long countByIsDeletedFalse();
 
+    long countByDepartmentId(Long departmentId);
 }
