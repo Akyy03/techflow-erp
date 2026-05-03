@@ -17,7 +17,6 @@ public class LeaveRequestController {
 
     private final LeaveRequestService leaveRequestService;
 
-    // Folosește userId pentru creare
     @PostMapping("/employee/{userId}")
     public ResponseEntity<LeaveRequest> createRequest(
             @PathVariable Long userId,
@@ -25,7 +24,6 @@ public class LeaveRequestController {
         return ResponseEntity.ok(leaveRequestService.createRequest(userId, request));
     }
 
-    // Folosește userId pentru istoric
     @GetMapping("/employee/{userId}")
     public ResponseEntity<List<LeaveRequest>> getMyRequests(@PathVariable Long userId) {
         return ResponseEntity.ok(leaveRequestService.getRequestsByUserId(userId));

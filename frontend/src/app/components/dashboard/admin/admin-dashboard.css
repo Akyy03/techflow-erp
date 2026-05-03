@@ -1,25 +1,19 @@
 .bento-card {
-  background: rgba(30, 41, 59, 0.4);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
   transition: all 0.3s ease;
-  border-radius: 12px;
-}
-.bento-card:hover {
-  background: rgba(30, 41, 59, 0.6);
-  border-color: rgba(99, 102, 241, 0.3);
 }
 
 .stats-row {
   display: grid;
-  gap: 15px; 
+  gap: 15px;
   margin-bottom: 30px;
 }
+
 .stat-item-compact {
   padding: 16px 20px !important;
   display: flex;
   flex-direction: column;
 }
+
 .stat-value-compact {
   font-size: 1.5rem;
   font-weight: 800;
@@ -28,13 +22,6 @@
   font-family: 'JetBrains Mono', monospace;
 }
 
-.tf-label {
-  font-size: 0.6rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #64748b;
-  font-weight: 700;
-}
 .section-title {
   color: white;
   font-size: 1rem;
@@ -44,21 +31,16 @@
   letter-spacing: -0.5px;
 }
 
-/* Adaptare grafic pentru designul tău */
 :host ::ng-deep .ngx-charts text {
-  fill: #94a3b8 !important; /* Text gri deschis */
+  fill: #94a3b8 !important;
 }
 
 :host ::ng-deep .legend-label-text {
-  fill: #e2e8f0 !important; /* Etichete albe */
+  fill: #e2e8f0 !important;
 }
 
 .ngx-charts-outer {
   height: 100%;
-}
-
-.admin-grid {
-  grid-template-columns: repeat(4, 1fr) !important;
 }
 
 .admin-grid {
@@ -68,7 +50,6 @@
   margin-bottom: 30px;
 }
 
-/* Assignments List View - Stiluri lipsă */
 .tasks-list {
   display: flex;
   flex-direction: column;
@@ -83,10 +64,10 @@
   border-radius: 12px;
 }
 
-.task-info { 
-  display: flex; 
-  flex-direction: column; 
-  gap: 4px; 
+.task-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .task-title {
@@ -96,7 +77,6 @@
   margin: 0;
 }
 
-/* Badge-uri și Label-uri */
 .badge {
   background: rgba(99, 102, 241, 0.08);
   color: #818cf8;
@@ -108,15 +88,9 @@
   text-transform: uppercase;
 }
 
-.unit-id {
-  font-family: 'JetBrains Mono', monospace;
-  color: #475569;
-  font-size: 0.7rem;
-}
-
 .badge-urgent {
-  background: rgba(239, 68, 68, 0.15); /* Roșu discret */
-  color: #f87171; /* Roșu deschis */
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
   border: 1px solid rgba(239, 68, 68, 0.3);
   padding: 4px 10px;
   border-radius: 6px;
@@ -124,13 +98,7 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  animation: pulse 2s infinite; /* Mic efect vizual de atenție */
-}
-
-@keyframes pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.7; }
-  100% { opacity: 1; }
+  animation: pulse 2s infinite;
 }
 
 .chart-layout {
@@ -138,7 +106,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  height: 200px; /* Limităm înălțimea cardului */
+  height: 200px;
 }
 
 .chart-wrapper {
@@ -150,14 +118,13 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  min-width: 160px; /* Am mărit puțin ca să aibă loc */
-  margin-left: 20px; /* Îl depărtăm puțin de grafic */
+  min-width: 160px;
+  margin-left: 20px;
 }
 
 .legend-row {
   display: grid;
-  /* Coloana 1 (bulina): auto, Coloana 2 (textul): ocupă tot spațiul, Coloana 3 (cifra): fixă pe conținut */
-  grid-template-columns: 20px 1fr auto; 
+  grid-template-columns: 20px 1fr auto;
   align-items: center;
   gap: 10px;
 }
@@ -165,13 +132,13 @@
 .label {
   color: #94a3b8;
   font-size: 0.85rem;
-  white-space: nowrap; /* Previne ruperea textului pe două rânduri */
+  white-space: nowrap;
 }
 
 .value {
-  font-weight: 700; /* Cifrele mai groase arată mai bine */
+  font-weight: 700;
   color: #f1f5f9;
-  text-align: right; /* Aliniate perfect pe dreapta */
+  text-align: right;
 }
 
 .dot {

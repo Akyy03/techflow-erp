@@ -89,7 +89,6 @@
   box-shadow: 0 15px 25px -5px rgba(99, 102, 241, 0.5);
 }
 
-/* Stil pentru butonul dezactivat */
 .login-button.btn-disabled {
   opacity: 0.3;
   cursor: not-allowed;

@@ -12,4 +12,5 @@ import java.util.Optional;
 public interface DepartmentRepository extends JpaRepository<Department, Long> {
 
     @Query("SELECT d FROM Department d LEFT JOIN FETCH d.employees WHERE d.manager.email = :email")
-    Optional<Department> findByManagerEmail(@Param("email") String email);}
+    Optional<Department> findByManagerEmail(@Param("email") String email);
+}

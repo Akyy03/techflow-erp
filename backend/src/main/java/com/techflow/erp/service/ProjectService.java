@@ -38,7 +38,6 @@ public class ProjectService {
             Long deptId = user.getEmployee().getDepartment().getId();
             projects = projectRepository.findAllByDepartmentsId(deptId);
         } else {
-            // Un angajat simplu sau un user fără departament nu vede proiecte globale momentan
             projects = Collections.emptyList();
         }
 
@@ -49,17 +48,14 @@ public class ProjectService {
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Project not found with id: " + id));
 
-        // Folosim metoda convertToDTO pe care am pus-o la punct împreună
         return convertToDTO(project);
     }
 
     private ProjectDTO convertToDTO(Project project) {
-        // 1. Calcul Progres
         long totalTasks = taskRepository.countByProjectId(project.getId());
         long doneTasks = taskRepository.countByProjectIdAndStatus(project.getId(), TaskStatus.DONE);
         int progressPercent = (totalTasks > 0) ? (int) ((doneTasks * 100) / totalTasks) : 0;
 
-        // 2. Extragere Nume Creator
         String fullName = "System Admin";
         User creator = project.getCreatedBy();
         if (creator != null) {
@@ -70,7 +66,6 @@ public class ProjectService {
             }
         }
 
-        // 3. Extragere ID-uri Departamente (cu protecție la null)
         Set<Long> deptIds = (project.getDepartments() != null)
                 ? project.getDepartments().stream()
                 .map(Department::getId)
@@ -93,14 +88,12 @@ public class ProjectService {
         if (project.getStatus() == null) {
             project.setStatus(ProjectStatus.ACTIVE);
         }
-        // Setăm creatorul automat la salvare
         project.setCreatedBy(currentUser);
 
         Project savedProject = projectRepository.save(project);
         return convertToDTO(savedProject);
     }
 
-    // Metodă temporară ca să deblocăm Frontend-ul
     public List<ProjectDTO> getAllProjectsForDebug() {
         return projectRepository.findAll().stream()
                 .map(this::convertToDTO)
@@ -116,7 +109,7 @@ public class ProjectService {
                 .orElseThrow(() -> new RuntimeException("Department not found"));
 
         project.getDepartments().add(dept);
-        projectRepository.save(project); // Aici se scrie în tabela project_departments
+        projectRepository.save(project);
     }
 
     @Transactional
@@ -124,7 +117,6 @@ public class ProjectService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("Project not found"));
 
-        // Scoatem departamentul din setul proiectului
         project.getDepartments().removeIf(d -> d.getId().equals(deptId));
         projectRepository.save(project);
     }
@@ -134,7 +126,6 @@ public class ProjectService {
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Project not found"));
 
-        // Actualizăm doar câmpurile de bază
         project.setName(dto.getName());
         project.setDescription(dto.getDescription());
         project.setDeadline(dto.getDeadline());

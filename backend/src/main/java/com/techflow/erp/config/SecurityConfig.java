@@ -39,14 +39,14 @@ public class SecurityConfig {
                     return opt;
                 }))
                 .csrf(AbstractHttpConfigurer::disable)
-                // Aici spunem aplicației că nu folosim sesiuni (stateless)
+                // Aici spunem aplicatiei ca nu folosim sesiuni (stateless)
                 .sessionManagement(session -> session.sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/api/reports/**").hasAnyRole("ADMIN", "MANAGER")
                         .anyRequest().authenticated()
                 )
-                // Aici adăugăm filtrul nostru înainte de cel standard de Spring
+                // Aici adaugam filtru custom de cel standard de Spring
                 .addFilterBefore(jwtAuthFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -54,7 +54,7 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return new UserDetailsServiceImpl(userRepository); // Injectează repository-ul
+        return new UserDetailsServiceImpl(userRepository);
     }
 
     @Bean

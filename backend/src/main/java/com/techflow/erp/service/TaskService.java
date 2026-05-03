@@ -37,13 +37,12 @@ public class TaskService {
     private TaskDTO convertToDTO(Task task) {
         String assignedName = "Unassigned";
 
-        // Verificăm dacă task-ul are un user alocat și dacă acel user are profil de angajat
         User assignee = task.getAssignedTo();
         if (assignee != null) {
             if (assignee.getEmployee() != null) {
                 assignedName = assignee.getEmployee().getFirstName() + " " + assignee.getEmployee().getLastName();
             } else {
-                assignedName = assignee.getEmail(); // Fallback la email pentru admini
+                assignedName = assignee.getEmail();
             }
         }
 
@@ -90,7 +89,7 @@ public class TaskService {
                 .title(dto.getTitle())
                 .description(dto.getDescription())
                 .deadline(dto.getDeadline())
-                .status(TaskStatus.TODO) // Toate task-urile noi pleacă din TODO
+                .status(TaskStatus.TODO)
                 .project(projectRepository.getReferenceById(dto.getProjectId()))
                 .assignedTo(dto.getAssignedToId() != null ?
                         userRepository.getReferenceById(dto.getAssignedToId()) : null)
@@ -109,7 +108,7 @@ public class TaskService {
     public List<TaskDTO> getRecentTasks() {
         return taskRepository.findTop3ByStatusNotOrderByDeadlineAsc(TaskStatus.DONE)
                 .stream()
-                .map(this::convertToDTO) // Presupun că ai o metodă de conversie
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 

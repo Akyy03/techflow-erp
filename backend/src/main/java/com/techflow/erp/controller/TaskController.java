@@ -53,20 +53,17 @@ public class TaskController {
             task.setDeadline(LocalDate.parse((String) payload.get("deadline")));
         }
 
-        // Rezolvare cu USER în loc de EMPLOYEE:
         if (payload.get("assignedToId") != null) {
             Long userId = Long.valueOf(payload.get("assignedToId").toString());
 
-            // Căutăm în UserRepository, nu în EmployeeRepository
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
-            task.setAssignedTo(user); // Acum tipurile se potrivesc
+            task.setAssignedTo(user);
         }
 
         Task updatedTask = taskRepository.save(task);
 
-        // Returnăm un DTO sau un simplu mesaj de succes pentru a evita erorile de serializare
         return ResponseEntity.ok().body(Map.of("message", "Task updated successfully"));
     }
 
@@ -76,7 +73,7 @@ public class TaskController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/my-tasks/{userId}") // Temporar punem userId in path
+    @GetMapping("/my-tasks/{userId}")
     public ResponseEntity<List<TaskDTO>> getMyTasks(@PathVariable Long userId) {
         return ResponseEntity.ok(taskService.getTasksByUserId(userId));
     }

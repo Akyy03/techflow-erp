@@ -4,7 +4,10 @@ import com.techflow.erp.constant.LeaveStatus;
 import com.techflow.erp.constant.ProjectStatus;
 import com.techflow.erp.constant.TaskStatus;
 import com.techflow.erp.dto.response.AdminStatsDTO;
-import com.techflow.erp.repository.*;
+import com.techflow.erp.repository.EmployeeRepository;
+import com.techflow.erp.repository.LeaveRequestRepository;
+import com.techflow.erp.repository.ProjectRepository;
+import com.techflow.erp.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +33,7 @@ public class StatsService {
                 leaveRequestRepository.countByStatus(LeaveStatus.PENDING),
                 taskRepository.countByStatusNotAndDeadlineBefore(
                         TaskStatus.DONE,
-                        LocalDate.now().plusDays(5) // "Urgent" = Deadline în următoarele 5 zile
+                        LocalDate.now().plusDays(5)
                 )
         );
     }
@@ -49,8 +52,6 @@ public class StatsService {
     private List<Map<String, Object>> mapToResultList(List<Object[]> rawStats) {
         return rawStats.stream().map(row -> {
             Map<String, Object> map = new HashMap<>();
-            // row[0] este Status-ul (ex: TODO, IN_PROGRESS)
-            // row[1] este Numărătoarea (ex: 5L)
             map.put("name", row[0] != null ? row[0].toString() : "UNKNOWN");
             map.put("value", row[1]);
             return map;

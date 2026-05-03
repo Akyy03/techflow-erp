@@ -42,14 +42,10 @@ public class DepartmentService {
         departmentRepository.delete(dept);
     }
 
-    // DepartmentService.java
     public Department getDepartmentByManagerEmail(String email) {
-        // 1. Găsim angajatul după email
-        // Presupunem că ai metoda findByEmail în EmployeeRepository
         Employee emp = employeeRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Angajat negăsit: " + email));
 
-        // 2. Returnăm departamentul lui
         if (emp.getDepartment() == null) {
             throw new RuntimeException("Acest manager nu este alocat niciunui departament!");
         }

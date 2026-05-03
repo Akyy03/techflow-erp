@@ -4,18 +4,16 @@ import com.techflow.erp.entity.Department;
 import com.techflow.erp.service.DepartmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/departments")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.PATCH, RequestMethod.DELETE})public class DepartmentController {
+@CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.PATCH, RequestMethod.DELETE})
+public class DepartmentController {
 
     private final DepartmentService departmentService;
 
@@ -58,7 +56,7 @@ import java.util.Map;
     @PatchMapping("/my-department/description")
     public ResponseEntity<Department> updateDescription(
             @RequestHeader("User-Email") String email,
-            @RequestBody Map<String, String> body) { // Folosește Map ca să citești cheia "description"
+            @RequestBody Map<String, String> body) {
 
         String newDescription = body.get("description");
         Department updated = departmentService.updateDepartmentDescription(email, newDescription);

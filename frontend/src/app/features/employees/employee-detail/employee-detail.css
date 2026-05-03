@@ -48,7 +48,7 @@
   background: rgba(99, 102, 241, 0.1);
   border-color: rgba(99, 102, 241, 0.3);
   color: white;
-  transform: translateX(-5px); /* Efect de "tragere" spre stânga */
+  transform: translateX(-5px);
 }
 
 .back-icon-circle {
@@ -67,7 +67,6 @@
   color: white;
 }
 
-/* Cardul de control Admin */
 .admin-control-card {
   margin-top: 40px;
   padding: 30px;
@@ -89,7 +88,6 @@
   text-transform: uppercase;
 }
 
-/* Butonul de Promote - Indigo Glow */
 .tf-btn-promote {
   background: #6366f1;
   color: white;
@@ -111,7 +109,6 @@
   box-shadow: 0 10px 25px rgba(99, 102, 241, 0.5);
 }
 
-/* Butonul de Demote - Soft Red Ghost */
 .tf-btn-demote {
   background: rgba(239, 68, 68, 0.1);
   color: #ef4444;

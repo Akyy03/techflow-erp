@@ -99,7 +99,6 @@ public class EmployeeService {
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
     }
 
-    // --- Metode pentru Profilul Meu ---
     public Employee findByEmail(String email) {
         return employeeRepository.findByUserEmail(email)
                 .orElseThrow(() -> new RuntimeException("Profilul nu a fost găsit pentru email: " + email));
@@ -138,15 +137,12 @@ public class EmployeeService {
     }
 
     private EmployeeResponse mapToResponse(Employee emp) {
-        // 1. Folosim ID-ul de Employee, nu de User!
         Long employeeId = emp.getId();
 
-        // 2. Protecție la null pentru User
         String email = (emp.getUser() != null) ? emp.getUser().getEmail() : emp.getEmail();
         String currentRole = (emp.getUser() != null) ? emp.getUser().getRole().name() : "EMPLOYEE";
         String tempPass = (emp.getUser() != null) ? emp.getUser().getTempPasswordPlain() : null;
 
-        // 3. PROTECȚIE CRITICĂ la Department (Aici crapă arhiva de obicei)
         Long deptId = (emp.getDepartment() != null) ? emp.getDepartment().getId() : null;
         String deptName = (emp.getDepartment() != null) ? emp.getDepartment().getName() : "Fără Departament";
 
@@ -163,7 +159,7 @@ public class EmployeeService {
                 emp.getHireDate() != null ? emp.getHireDate().toString() : null,
                 currentRole,
                 tempPass,
-                emp.isDeleted() // Asigură-te că getter-ul returnează ce trebuie
+                emp.isDeleted()
         );
     }
 

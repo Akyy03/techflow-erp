@@ -1,7 +1,6 @@
 /* Import font pentru stilul tehnic */
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
 
-/* Grid-ul principal: Formular mic în stânga, Tabel mare în dreapta */
 .leaves-grid {
   display: grid;
   grid-template-columns: 380px 1fr;
@@ -9,52 +8,6 @@
   align-items: start;
 }
 
-/* Stilul de Bento Card (identic cu cel de la Departamente) */
-.bento-card {
-  background: rgba(30, 41, 59, 0.4);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 20px;
-  padding: 24px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.bento-card:hover {
-  background: rgba(30, 41, 59, 0.5);
-  border-color: rgba(99, 102, 241, 0.2);
-}
-
-/* Etichete de tip "TechFlow" */
-.tf-label {
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: #64748b;
-  font-weight: 700;
-  margin-bottom: 8px;
-  display: block;
-}
-
-/* Input-uri adaptate pentru Dark Mode */
-.tf-input {
-  width: 100%;
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 12px;
-  color: white;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.9rem;
-  margin-bottom: 20px;
-  transition: border-color 0.3s;
-}
-
-.tf-input:focus {
-  outline: none;
-  border-color: #6366f1;
-}
-
-/* Tabelul stilizat */
 .tf-table {
   width: 100%;
   border-collapse: collapse;
@@ -74,28 +27,12 @@
   font-size: 0.9rem;
 }
 
-/* Stil JetBrains pentru perioade și ID-uri */
 .mono-text {
   font-family: 'JetBrains Mono', monospace;
   color: #e2e8f0;
   font-size: 0.85rem;
 }
 
-/* Badge-uri de Status (identice cu restul aplicației) */
-.status-badge {
-  font-size: 10px;
-  font-weight: 800;
-  padding: 4px 10px;
-  border-radius: 6px;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
-
-.status-pending { background: rgba(245, 158, 11, 0.1); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.2); }
-.status-approved { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); }
-.status-rejected { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
-
-/* Butoane de Acțiune (Approve/Reject) */
 .action-btn-group {
   display: flex;
   gap: 8px;
@@ -111,10 +48,18 @@
   transition: all 0.2s;
 }
 
-.btn-action.approve:hover { background: #10b981; color: white; border-color: #10b981; }
-.btn-action.reject:hover { background: #ef4444; color: white; border-color: #ef4444; }
+.btn-action.approve:hover {
+  background: #10b981;
+  color: white;
+  border-color: #10b981;
+}
 
-/* Alert Mesaje */
+.btn-action.reject:hover {
+  background: #ef4444;
+  color: white;
+  border-color: #ef4444;
+}
+
 .alert {
   padding: 12px 20px;
   border-radius: 12px;
@@ -124,11 +69,6 @@
   background: rgba(99, 102, 241, 0.1);
   color: #818cf8;
   border: 1px solid rgba(99, 102, 241, 0.2);
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Ajustare pentru Admin (fără formular, tabel full width) */

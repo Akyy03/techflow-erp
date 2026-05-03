@@ -17,11 +17,9 @@ public class PublicHolidayService {
     private final RestTemplate restTemplate;
 
     public List<LocalDate> getRomanianHolidays(int year) {
-        // RO vine de la România
         String url = "https://date.nager.at/api/v3/PublicHolidays/" + year + "/RO";
 
         try {
-            // Facem cererea GET și mapăm rezultatul într-un array de DTO-uri
             PublicHolidayDTO[] response = restTemplate.getForObject(url, PublicHolidayDTO[].class);
 
             if (response != null) {
@@ -30,7 +28,6 @@ public class PublicHolidayService {
                         .collect(Collectors.toList());
             }
         } catch (Exception e) {
-            // Logăm eroarea și returnăm o listă goală pentru a nu bloca aplicația
             System.err.println("Eroare la obținerea sărbătorilor legale: " + e.getMessage());
         }
 

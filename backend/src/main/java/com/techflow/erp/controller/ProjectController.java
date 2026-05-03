@@ -19,21 +19,17 @@ public class ProjectController {
 
     @GetMapping
     public ResponseEntity<List<ProjectDTO>> getProjects() {
-        System.out.println(">>> Request primit pe /api/projects - Bypass Security Mode");
-        // Chemăm direct metoda care dă TOT, fără să mai întrebăm cine e userul
         return ResponseEntity.ok(projectService.getAllProjectsForDebug());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProjectDTO> getProjectById(@PathVariable Long id) {
-        // Chemăm service-ul să ne dea proiectul convertit deja în DTO
         ProjectDTO projectDTO = projectService.getProjectById(id);
         return ResponseEntity.ok(projectDTO);
     }
 
     @PostMapping
     public ResponseEntity<ProjectDTO> createProject(@RequestBody Project project) {
-        // Punem un user dummy sau null momentan pentru salvare
         return ResponseEntity.ok(projectService.saveProject(project, null));
     }
 

@@ -41,7 +41,6 @@ public class LeaveRequestService {
         return leaveRequestRepository.save(request);
     }
 
-    // Redenumită pentru a evita conflictul de semnătură
     public List<LeaveRequest> getRequestsByUserId(Long userId) {
         return leaveRequestRepository.findAllByUserId(userId);
     }

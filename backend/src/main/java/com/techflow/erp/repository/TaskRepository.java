@@ -19,7 +19,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     // Toate task-urile asignate unui om (pentru "My Tasks")
     List<Task> findByAssignedToId(Long userId);
 
-    // Numarul de task-uri dintr-un proiect cu un anumit status (ne ajuta la progres)
+    // Numarul de task-uri dintr-un proiect cu un anumit status
     long countByProjectIdAndStatus(Long projectId, TaskStatus status);
 
     // Numarul total de task-uri dintr-un proiect

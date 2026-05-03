@@ -1,22 +1,23 @@
 package com.techflow.erp.service;
 
+import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
 import com.lowagie.text.FontFactory;
+import com.lowagie.text.Paragraph;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
 import com.techflow.erp.dto.response.EmployeeResponse;
 import com.techflow.erp.entity.Task;
 import com.techflow.erp.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
-import com.lowagie.text.Document;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.Paragraph;
-import com.lowagie.text.pdf.PdfWriter;
-import java.awt.Color;
 
+import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -28,7 +29,7 @@ public class ReportService {
     private final TaskRepository taskRepository;
     private final EmployeeService employeeService;
 
-    // --- GENERARE RAPORT MANAGER (Echipa proprie) ---
+    // Generare raport manager (Echipa proprie)
     public byte[] generateExcelReport(String email) throws IOException {
         Long deptId = employeeService.findByEmail(email).getDepartment().getId();
         List<Task> tasks = taskRepository.findByAssignedTo_Employee_Department_Id(deptId);
@@ -63,7 +64,7 @@ public class ReportService {
         }
     }
 
-    // --- GENERARE RAPORT ADMIN (Master) ---
+    // Generare raport admin (Toate taskurile + HR & Buget)
     public byte[] generateAdminMasterReport() throws IOException {
         List<Task> allTasks = taskRepository.findAll();
         List<EmployeeResponse> allEmployees = employeeService.getAllEmployeesIncludeDeleted();
@@ -116,7 +117,7 @@ public class ReportService {
         }
     }
 
-    // Metoda pentru Manager (Team Report)
+    // Metoda pentru Manager (Raport PDF)
     public byte[] generateManagerPdf(String email) {
         Long deptId = employeeService.findByEmail(email).getDepartment().getId();
         List<Task> tasks = taskRepository.findByAssignedTo_Employee_Department_Id(deptId);
@@ -158,7 +159,7 @@ public class ReportService {
         return out.toByteArray();
     }
 
-    // Metoda pentru Admin (Master Report)
+    // Metoda pentru Admin (Raport PDF Global)
     public byte[] generateAdminPdf() {
         List<Task> allTasks = taskRepository.findAll();
         List<EmployeeResponse> allEmployees = employeeService.getAllEmployeesIncludeDeleted();
@@ -170,11 +171,9 @@ public class ReportService {
             PdfWriter.getInstance(document, out);
             document.open();
 
-            // --- Titlu ---
             document.add(new Paragraph("Raport Master ERP - Global", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20)));
             document.add(new Paragraph(" "));
 
-            // --- Tabel Task-uri ---
             document.add(new Paragraph("Toate Task-urile din Sistem", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14)));
             document.add(new Paragraph(" "));
 
@@ -198,7 +197,6 @@ public class ReportService {
             }
             document.add(taskTable);
 
-            // --- Tabel HR & Buget ---
             document.add(new Paragraph(" "));
             document.add(new Paragraph("Situație HR & Buget", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14)));
             document.add(new Paragraph(" "));
@@ -232,7 +230,6 @@ public class ReportService {
         return out.toByteArray();
     }
 
-    // --- HELPER METHODS (Logica PRO) ---
 
     private void createManagerSummarySheet(Workbook workbook, List<Task> tasks) {
         Sheet sheet = workbook.createSheet("Sumar");
@@ -264,7 +261,7 @@ public class ReportService {
         PatternFormatting fill = rule.createPatternFormatting();
         fill.setFillForegroundColor(IndexedColors.RED.getIndex());
         fill.setFillPattern(PatternFormatting.SOLID_FOREGROUND);
-        CellRangeAddress[] regions = { new CellRangeAddress(1, lastRow, 3, 3) };
+        CellRangeAddress[] regions = {new CellRangeAddress(1, lastRow, 3, 3)};
         sheetCF.addConditionalFormatting(regions, rule);
     }
 

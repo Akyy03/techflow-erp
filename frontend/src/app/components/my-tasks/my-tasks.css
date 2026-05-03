@@ -27,14 +27,6 @@
 }
 
 /* --- LABELS & BADGES --- */
-.tf-label {
-  color: #64748b;
-  font-size: 0.7rem;
-  font-weight: 800;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-}
-
 .count-badge {
   background: rgba(99, 102, 241, 0.1);
   color: #6366f1;
@@ -46,15 +38,13 @@
 
 /* --- TASK CARD BENTO STYLE --- */
 .task-card {
-  background: rgba(30, 41, 59, 0.5); /* Semi-transparent dark */
+  background: rgba(30, 41, 59, 0.5);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 16px;
   padding: 20px;
   will-change: transform;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: grab;
   position: relative;
   overflow: hidden;
@@ -64,9 +54,9 @@
   display: flex;
   flex-direction: column;
   gap: 15px;
-  min-height: 400px; /* Foarte important: să aibă unde să pici task-ul */
+  min-height: 400px;
   width: 100%;
-  pointer-events: auto; /* Activăm interacțiunea */
+  pointer-events: auto;
   z-index: 10;
 }
 
@@ -110,16 +100,6 @@
   font-size: 0.85rem;
   margin: 0 0 16px 0;
   line-height: 1.5;
-}
-
-.unit-id {
-  font-family: 'JetBrains Mono', 'Courier New', monospace;
-  color: #475569;
-  font-size: 0.75rem;
-  background: rgba(0, 0, 0, 0.2);
-  padding: 4px 8px;
-  border-radius: 6px;
-  display: inline-block;
 }
 
 /* --- DRAG & DROP STATES --- */

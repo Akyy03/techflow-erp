@@ -104,10 +104,20 @@
       <div class="modal-icon-header info"><span>📞</span></div>
       <h3>Update Contact</h3>
       <p>Enter your new contact number below.</p>
-      <input type="text" class="modal-input" [(ngModel)]="newPhone" placeholder="07xx xxx xxx" />
+      <input 
+        type="text" 
+        class="modal-input" 
+        [(ngModel)]="newPhone" 
+        (input)="onPhoneInput($event)"
+        (keydown)="onPhoneKeydown($event)"
+        placeholder="07xxxxxxxx"
+        required
+        pattern="^07\d{8}$"
+        title="Must be in format 07xxxxxxxx with exactly 10 digits"
+      />
       <div class="modal-actions">
         <button (click)="closeModals()" class="btn-ghost">Cancel</button>
-        <button (click)="savePhone()" class="btn-primary-gradient">Update Number</button>
+        <button (click)="savePhone()" class="btn-primary-gradient" [disabled]="!isPhoneValid()">Update Number</button>
       </div>
     </div>
   </div>
@@ -121,11 +131,13 @@
         type="password"
         class="modal-input"
         [(ngModel)]="newPassword"
-        placeholder="New Password"
+        placeholder="New Password (min 5 characters)"
+        required
+        minlength="5"
       />
       <div class="modal-actions">
         <button (click)="closeModals()" class="btn-ghost">Cancel</button>
-        <button (click)="savePassword()" class="btn-primary-gradient">Change Password</button>
+        <button (click)="savePassword()" class="btn-primary-gradient" [disabled]="!isPasswordValid()">Change Password</button>
       </div>
     </div>
   </div>

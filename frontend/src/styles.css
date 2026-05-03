@@ -1,9 +1,60 @@
 @import 'tailwindcss';
 
+:root {
+  /* --- PRIMARY COLORS --- */
+  --color-indigo: #6366f1;
+  --color-indigo-hover: #4f46e5;
+  --color-indigo-light: #818cf8;
+  --color-indigo-faint: rgba(99, 102, 241, 0.1);
+  
+  /* --- NEUTRAL COLORS --- */
+  --color-bg-dark: #030712;
+  --color-bg-slate: #1e293b;
+  --color-bg-card: rgba(30, 41, 59, 0.4);
+  --color-bg-card-hover: rgba(30, 41, 59, 0.6);
+  --color-text-white: #f8fafc;
+  --color-text-light: #e2e8f0;
+  --color-text-gray: #94a3b8;
+  --color-text-muted: #64748b;
+  --color-text-darker: #475569;
+  --color-border: rgba(255, 255, 255, 0.05);
+  --color-border-indigo: rgba(99, 102, 241, 0.2);
+  
+  /* --- STATUS COLORS --- */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-danger-light: #f87171;
+  
+  /* --- SPACING --- */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 20px;
+  --spacing-2xl: 24px;
+  --spacing-3xl: 32px;
+  --spacing-4xl: 40px;
+  
+  /* --- BORDER RADIUS --- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-3xl: 24px;
+  --radius-full: 50%;
+  
+  /* --- TRANSITIONS --- */
+  --transition-fast: 0.1s ease-out;
+  --transition-base: 0.2s ease;
+  --transition-slow: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 @layer base {
   body {
-    background-color: #030712;
-    color: white;
+    background-color: var(--color-bg-dark);
+    color: var(--color-text-white);
     margin: 0;
     font-family: 'Inter', sans-serif;
   }
@@ -25,47 +76,71 @@
   /* --- BENTO CARDS --- */
   .bento-card {
     display: block;
-    background-color: rgba(15, 23, 42, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 1.5rem;
-    padding: 2rem;
-    transition:
-      transform 0.2s ease,
-      border-color 0.2s ease;
-    margin-bottom: 1rem;
+    background-color: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-2xl);
+    transition: transform var(--transition-base) ease, border-color var(--transition-base) ease;
+    margin-bottom: var(--spacing-lg);
+    backdrop-filter: blur(12px);
   }
 
   .bento-card:hover {
-    border-color: rgba(99, 102, 241, 0.5);
+    border-color: var(--color-border-indigo);
     transform: translateY(-2px);
+    background-color: var(--color-bg-card-hover);
   }
 
-  /* --- FORMULAR STATIC & HIGHLIGHT --- */
-
+  /* --- LABELS --- */
   .tf-label {
     display: block;
-    font-size: 10px;
+    font-size: 0.65rem;
     font-weight: 700;
-    color: #94a3b8;
+    color: var(--color-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--spacing-sm);
   }
 
-  /* --- BUTTONS (Indigo/Slate Theme) --- */
+  /* --- INPUTS --- */
+  .tf-input {
+    width: 100%;
+    background-color: rgba(15, 23, 42, 0.6) !important;
+    border: 1px solid rgba(51, 65, 85, 0.8) !important;
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md) var(--spacing-lg);
+    color: white;
+    font-size: 0.9375rem;
+    transition: border-color var(--transition-fast) !important;
+    outline: none !important;
+    display: block;
+  }
+
+  .tf-input:focus {
+    border-color: var(--color-indigo) !important;
+    background-color: #1e293b !important;
+    box-shadow: 0 0 0 1px var(--color-indigo) !important;
+  }
+
+  select.tf-input option {
+    background-color: var(--color-bg-slate);
+    color: white;
+  }
+
+  /* --- PRIMARY BUTTON --- */
   .tf-btn-primary {
-    background: #6366f1;
+    background: var(--color-indigo);
     color: white;
     font-weight: 600;
-    border-radius: 0.75rem;
-    padding: 0.75rem 1.5rem;
-    transition: all 0.2s ease;
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md) var(--spacing-xl);
+    transition: all var(--transition-base) ease;
     border: none;
     cursor: pointer;
   }
 
   .tf-btn-primary:hover:not(:disabled) {
-    background: #4f46e5;
+    background: var(--color-indigo-hover);
     box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
   }
 
@@ -75,14 +150,15 @@
     background: #334155;
   }
 
+  /* --- SECONDARY BUTTON --- */
   .tf-btn-secondary {
     background: rgba(51, 65, 85, 0.5);
     color: #f8fafc;
     font-weight: 600;
-    border-radius: 0.75rem;
-    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md) var(--spacing-xl);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.2s ease;
+    transition: all var(--transition-base) ease;
     cursor: pointer;
   }
 
@@ -91,57 +167,39 @@
     border-color: rgba(255, 255, 255, 0.2);
   }
 
-  /* --- ACTION BUTTONS (Edit/Delete pe Card) --- */
+  /* --- ACTION BUTTONS --- */
   .card-action-btn {
     width: 32px;
     height: 32px;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
     border: 1px solid rgba(255, 255, 255, 0.05);
     background: rgba(15, 23, 42, 0.8);
-    color: #94a3b8;
+    color: var(--color-text-gray);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base) ease;
   }
 
   .card-action-btn.edit:hover {
-    color: #6366f1;
-    border-color: #6366f1;
-    background: rgba(99, 102, 241, 0.1);
+    color: var(--color-indigo);
+    border-color: var(--color-indigo);
+    background: var(--color-indigo-faint);
   }
 
   .card-action-btn.delete:hover {
-    color: #ef4444;
-    border-color: #ef4444;
+    color: var(--color-danger);
+    border-color: var(--color-danger);
     background: rgba(239, 68, 68, 0.1);
   }
 
-  .tf-input {
-    width: 100%;
-    background-color: #1e293b !important;
-    border: 1px solid #334155 !important;
-    border-radius: 0.75rem;
-    padding: 0.75rem 1rem;
-    color: white;
-    font-size: 0.9375rem;
-    transition: border-color 0.05s ease-out !important;
-    outline: none !important;
-    display: block;
-  }
-
-  .tf-input:focus {
-    border-color: #6366f1 !important;
-    background-color: #1e293b !important;
-    box-shadow: 0 0 0 1px #6366f1 !important;
-  }
-
+  /* --- MODAL OVERLAY --- */
   .modal-overlay {
     position: fixed;
     inset: 0;
     background: rgba(2, 6, 23, 0.95);
-    backdrop-filter: none !important;
+    backdrop-filter: blur(8px);
     z-index: 1000;
     display: flex;
     align-items: center;
@@ -149,51 +207,141 @@
   }
 
   /* --- BADGES --- */
-  .dept-badge {
+  .dept-badge,
+  .status-badge {
     font-size: 10px;
     font-weight: 800;
     padding: 4px 10px;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     letter-spacing: 0.5px;
     text-transform: uppercase;
   }
 
-  /* ELIMINARE ANIMAȚII MODAL (Forțăm formularul să apară instant) */
+  .status-pending {
+    background: rgba(245, 158, 11, 0.1);
+    color: #fbbf24;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+  }
+
+  .status-approved {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--color-success);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+  }
+
+  .status-rejected {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--color-danger);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+  }
+
+  .status-active {
+    background: rgba(16, 185, 129, 0.08);
+    color: var(--color-success);
+    border: 1px solid rgba(16, 185, 129, 0.1);
+  }
+
+  .status-hold {
+    background: rgba(245, 158, 11, 0.08);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.1);
+  }
+
+  /* --- UNIT ICON --- */
+  .unit-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2));
+    border: 1px solid var(--color-border-indigo);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-indigo-light);
+    font-size: 1.2rem;
+    font-weight: 800;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* --- UNIT ID TEXT --- */
+  .unit-id {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--color-text-darker);
+    font-size: 0.75rem;
+  }
+
+  .project-id {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--color-text-darker);
+    font-size: 0.75rem;
+  }
+
+  /* --- PAGE WRAPPER --- */
+  .tf-page-wrapper {
+    padding: var(--spacing-4xl);
+    max-width: 1400px;
+    margin: 0 auto;
+    display: block;
+  }
+
+  /* --- PAGE HEADER --- */
+  .tf-page-header {
+    margin-bottom: var(--spacing-2xl);
+  }
+
+  .tf-page-header h1 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: white;
+    margin: 0;
+    text-transform: uppercase;
+  }
+
+  .tf-page-header h1 span {
+    color: var(--color-indigo);
+  }
+
+  .tf-page-header p {
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    margin-top: 4px;
+  }
+
+  /* --- ANIMATIONS --- */
+  @keyframes fadeIn {
+    from { 
+      opacity: 0;
+    }
+    to { 
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from { 
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to { 
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% { 
+      opacity: 1;
+    }
+    50% { 
+      opacity: 0.7;
+    }
+  }
+
+  /* --- ELIMINARE ANIMAȚII MODAL --- */
   .modal-container,
   .modal-box {
     animation: none !important;
     transform: none !important;
     transition: none !important;
   }
-
-  /* --- GLOBAL PAGE WRAPPER --- */
-.tf-page-wrapper {
-  padding: 40px; 
-  max-width: 1400px; 
-  margin: 0 auto;
-  display: block;
-}
-
-/* --- UNIFIED PAGE HEADER --- */
-.tf-page-header {
-  margin-bottom: 30px; 
-}
-
-.tf-page-header h1 {
-  font-size: 1.6rem; 
-  font-weight: 800; 
-  color: white; 
-  margin: 0;
-  text-transform: uppercase;
-}
-
-.tf-page-header h1 span {
-  color: #6366f1;
-}
-
-.tf-page-header p {
-  color: #64748b; 
-  font-size: 0.85rem; 
-  margin-top: 4px;
-}
 }

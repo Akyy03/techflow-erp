@@ -18,14 +18,11 @@ public class LeaveCalculationService {
             throw new IllegalArgumentException("Data de început nu poate fi după data de sfârșit.");
         }
 
-        // 1. Obținem sărbătorile legale pentru anul/anii respectivi
-        // (Luăm pentru anul de start; dacă perioada sare în alt an, e mai complex, dar momentan rămânem la unul)
         List<LocalDate> holidays = publicHolidayService.getRomanianHolidays(startDate.getYear());
 
         int workDays = 0;
         LocalDate current = startDate;
 
-        // 2. Iterăm prin fiecare zi din interval
         while (!current.isAfter(endDate)) {
 
             // Verificăm dacă NU este weekend (Sâmbătă sau Duminică)

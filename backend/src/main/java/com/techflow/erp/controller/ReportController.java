@@ -20,7 +20,6 @@ public class ReportController {
 
     private final ReportService reportService;
 
-    // Endpoint pentru Manageri
     @GetMapping("/export/my-team")
     @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<byte[]> exportMyTeam(Principal principal) throws IOException {
@@ -33,7 +32,6 @@ public class ReportController {
                 .body(excelContent);
     }
 
-    // Endpoint pentru Admini
     @GetMapping("/export/master")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<byte[]> exportMasterReport() throws IOException {
@@ -48,7 +46,6 @@ public class ReportController {
     @GetMapping("/pdf/manager")
     @PreAuthorize("hasAuthority('MANAGER')")
     public ResponseEntity<byte[]> exportManagerPdf(Principal principal) {
-        // principal.getName() returnează email-ul userului logat
         byte[] pdfContent = reportService.generateManagerPdf(principal.getName());
 
         return ResponseEntity.ok()
@@ -60,7 +57,6 @@ public class ReportController {
     @GetMapping("/pdf/admin")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<byte[]> exportAdminPdf() {
-        // Adminul vede tot, deci nu avem nevoie de email
         byte[] pdfContent = reportService.generateAdminPdf();
 
         return ResponseEntity.ok()

@@ -3,6 +3,7 @@ package com.techflow.erp.entity;
 import com.techflow.erp.constant.TaskStatus;
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDate;
 
 @Entity
@@ -34,7 +35,7 @@ public class Task {
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
-    // Un task este asignat unui singur om (conform discuției noastre)
+    // Un task este asignat unui singur om
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assigned_to_id")
     private User assignedTo;

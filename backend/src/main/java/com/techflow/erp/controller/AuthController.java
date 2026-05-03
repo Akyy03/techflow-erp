@@ -27,7 +27,6 @@ public class AuthController {
                     if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
                         String token = jwtService.generateToken(user.getEmail(), user.getRole().name());
 
-                        // Navigăm în siguranță: User -> Employee -> Department
                         Long deptId = (user.getEmployee() != null && user.getEmployee().getDepartment() != null)
                                 ? user.getEmployee().getDepartment().getId()
                                 : null;

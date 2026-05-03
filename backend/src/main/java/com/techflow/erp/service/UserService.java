@@ -19,13 +19,10 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // 1. Criptăm și salvăm noua parolă
         user.setPassword(passwordEncoder.encode(newPassword));
 
-        // 2. Dezactivăm flag-ul de forțare
         user.setNeedsPasswordChange(false);
 
-        // 3. Curățăm parola în clar (Security first!)
         user.setTempPasswordPlain(null);
 
         userRepository.save(user);

@@ -14,8 +14,6 @@ public class UserController {
 
     @PostMapping("/{id}/change-password")
     public ResponseEntity<Void> changePassword(@PathVariable Long id, @RequestBody String newPassword) {
-        // Notă: Într-o aplicație reală, newPassword ar trebui să vină într-un DTO 
-        // pentru validare, dar pentru acum, merge și așa.
         userService.changeInitialPassword(id, newPassword);
         return ResponseEntity.ok().build();
     }

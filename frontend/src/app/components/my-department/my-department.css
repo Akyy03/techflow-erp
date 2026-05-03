@@ -5,11 +5,6 @@
 }
 
 .bento-card {
-  background: rgba(30, 41, 59, 0.4);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 20px;
-  padding: 24px;
   display: flex;
   flex-direction: column;
 }
@@ -19,36 +14,6 @@
   font-weight: 800;
   font-family: 'JetBrains Mono', monospace;
   font-size: 1.1rem;
-}
-
-.unit-icon {
-  width: 50px;
-  height: 50px;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2));
-  border: 1px solid rgba(99, 102, 241, 0.2);
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #818cf8;
-  font-size: 1.2rem;
-  font-weight: 800;
-  font-family: 'JetBrains Mono', monospace;
-}
-
-.tf-label {
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: #64748b;
-  font-weight: 700;
-  margin-bottom: 5px;
-}
-
-.unit-id {
-  font-family: 'JetBrains Mono', monospace;
-  color: #475569;
-  font-size: 0.75rem;
 }
 
 .dept-badge {
@@ -115,7 +80,10 @@
   cursor: pointer;
 }
 
-.card-action-btn.edit:hover { color: #6366f1; border-color: #6366f1; }
+.card-action-btn.edit:hover {
+  color: #6366f1;
+  border-color: #6366f1;
+}
 
 .tf-input {
   background: rgba(15, 23, 42, 0.6);
